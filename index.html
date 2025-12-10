@@ -54,17 +54,23 @@
   margin-bottom: 1.1rem;
 }
 
-/* Mobile: keep chips on one line with horizontal scroll */
 @media (max-width: 600px) {
+
+  /* Filter button row spacing */
   .filter-buttons {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    padding-bottom: 0.25rem;
+    gap: 0.35rem;         /* slightly tighter spacing */
+    margin-bottom: 1rem;
+    flex-wrap: wrap;      /* allow them to wrap instead of scroll */
   }
 
-  .filter-buttons::-webkit-scrollbar {
-    display: none; /* Hide ugly scrollbar in iOS */
+  /* Filter pill styling */
+  .filter-btn {
+    padding: 0.35rem 0.9rem;  /* narrower left/right padding */
+    font-size: 0.9rem;        /* slightly smaller */
+    border-radius: 1rem;
   }
+
+}
 }
 
   .filter-btn {
