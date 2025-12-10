@@ -1,387 +1,252 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Forced Labor – Chore Chart</title>
+<div class="forced-labor-app">
+  <h1>Forced Labor</h1>
+  <p class="subtitle">Daily chore assignments pulled live from Dad's master sheet.</p>
 
-<!-- PWA / manifest -->
-<link rel="manifest" href="manifest.json" />
+  <div class="filter-buttons">
+    <button class="filter-btn active" data-kid="all">All</button>
+    <button class="filter-btn" data-kid="Emmitt">Emmitt</button>
+    <button class="filter-btn" data-kid="Turner">Turner</button>
+    <button class="filter-btn" data-kid="Miles">Miles</button>
+    <button class="filter-btn" data-kid="Stewart">Stewart</button>
+  </div>
 
-<!-- iPhone / iPad Home Screen Icon -->
-<link rel="apple-touch-icon" href="apple-touch-icon.png" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-title" content="Forced Labor" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black" />
-<meta name="theme-color" content="#000000" />
+  <div id="chores-container" class="chores-container">
+    <p class="loading">Loading chores from Google Sheets…</p>
+  </div>
+
+  <p class="footer-note">
+    Full chart: <a href="https://naturalkaos.com/chorechart" target="_blank" rel="noopener">naturalkaos.com/chorechart</a>
+  </p>
+</div>
 
 <style>
-:root {
-  --bg: #111111;
-  --card-bg: #181818;
-  --border: #333333;
-  --text: #f0f0f0;
-
-  --emmitt: #2684ff;
-  --turner: #3fbf6b;
-  --miles: #c852ff;
-  --stewart: #e5a72b;
-
-  --week-border: #facc15;
-}
-
-* {
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-}
-
-body {
-  margin: 0;
-  padding: 20px;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Helvetica, Arial, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  max-width: 960px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-h1 {
-  text-align: center;
-  font-size: 28px;
-  margin: 10px 0 24px;
-}
-
-h2 {
-  font-size: 18px;
-  margin: 0 0 12px;
-}
-
-.card {
-  background: var(--card-bg);
-  border-radius: 14px;
-  border: 1px solid var(--border);
-  padding: 20px;
-  margin-bottom: 24px;
-  box-shadow: 0 18px 35px rgba(0,0,0,0.35);
-}
-
-.label-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.label-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 14px;
-  border-radius: 999px;
-  font-size: 14px;
-  background: #262626;
-  border: 1px solid #3a3a3a;
-  cursor: pointer;
-  user-select: none;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.label-pill.active {
-  background: var(--current-color, #f0b429);
-  color: #000000;
-  border-color: transparent;
-  font-weight: 600;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-  font-size: 13px;
-}
-
-th, td {
-  border: 1px solid #262626;
-  padding: 8px 6px;
-  text-align: center;
-}
-
-th {
-  background: #1f1f1f;
-  font-weight: 600;
-}
-
-td:first-child {
-  text-align: left;
-}
-
-.boy-cell {
-  transition: background-color 0.18s ease, color 0.18s ease, opacity 0.18s ease;
-}
-
-.boy-cell.dim {
-  opacity: 0.25;
-}
-
-.boy-cell.highlight {
-  font-weight: 600;
-}
-
-/* Weekly current-week column highlight */
-.week-current-header,
-.week-current-cell {
-  box-shadow: inset 0 0 0 1px var(--week-border);
-  border-color: var(--week-border);
-}
-
-@media (max-width: 640px) {
-  body {
-    padding: 12px;
+  .forced-labor-app {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 1.5rem;
   }
 
-  h1 {
-    font-size: 22px;
+  .forced-labor-app h1 {
+    font-size: 2rem;
+    margin-bottom: 0.25rem;
   }
 
-  .card {
-    padding: 14px;
+  .subtitle {
+    color: #555;
+    margin-bottom: 1rem;
   }
 
-  table {
-    font-size: 11px;
+  .filter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
   }
 
-  th, td {
-    padding: 6px 4px;
+  .filter-btn {
+    border: 1px solid #ddd;
+    padding: 0.4rem 0.8rem;
+    border-radius: 999px;
+    background: #f5f5f5;
+    cursor: pointer;
+    font-size: 0.9rem;
   }
-}
+
+  .filter-btn.active {
+    background: #222;
+    color: #fff;
+    border-color: #222;
+  }
+
+  .chores-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .chore-card {
+    border-radius: 0.75rem;
+    padding: 0.85rem 1rem;
+    background: #fafafa;
+    border-left: 5px solid #ccc;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+
+  .chore-kid {
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+  }
+
+  .chore-daily,
+  .chore-weekly {
+    font-size: 0.9rem;
+    margin: 0.15rem 0;
+  }
+
+  .chore-label {
+    font-weight: 600;
+  }
+
+  .chore-date {
+    font-size: 0.75rem;
+    color: #777;
+    margin-top: 0.35rem;
+  }
+
+  .loading,
+  .empty-state,
+  .error-state {
+    grid-column: 1 / -1;
+    font-size: 0.95rem;
+    color: #666;
+  }
+
+  .error-state {
+    color: #b00020;
+  }
+
+  .footer-note {
+    margin-top: 1.25rem;
+    font-size: 0.8rem;
+    color: #777;
+  }
+
+  .footer-note a {
+    color: #0066cc;
+  }
+
+  /* Color accents by kid */
+  .kid-Emmitt {
+    border-left-color: #22c55e; /* green */
+  }
+  .kid-Turner {
+    border-left-color: #3b82f6; /* blue */
+  }
+  .kid-Miles {
+    border-left-color: #14b8a6; /* teal */
+  }
+  .kid-Stewart {
+    border-left-color: #a855f7; /* purple */
+  }
 </style>
-</head>
-<body>
-
-<h1>Forced Labor Chore Chart</h1>
-
-<div class="card">
-  <h2>Select Worker</h2>
-  <div class="label-row" id="boys"></div>
-</div>
-
-<div class="card">
-  <h2>Daily Chores</h2>
-  <p style="margin:0 0 6px;font-size:13px;color:#bbbbbb;">
-  </p>
-  <div id="daily"></div>
-</div>
-
-<div class="card">
-  <h2>Weekly Chores</h2>
-  <p style="margin:0 0 6px;font-size:13px;color:#bbbbbb;">
-  </p>
-  <div id="weekly"></div>
-</div>
 
 <script>
-// Color map for each boy (CSS custom properties)
-const boyColorVars = {
-  Emmitt: "--emmitt",
-  Turner: "--turner",
-  Miles: "--miles",
-  Stewart: "--stewart"
-};
+  (function () {
+    // TODO: PUT YOUR REAL SHEET ID HERE
+    const SHEET_ID = "1qQEGcKsi5SW6xiZZXkZbV5rY8x7Hs1ImXt8lIXN_uzE";
+    const SHEET_NAME = "Chores";
 
-const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const choresContainer = document.getElementById("chores-container");
+    const filterButtons = document.querySelectorAll(".filter-btn");
+    let todaysChores = [];
 
-// ---- DAILY SCHEDULE ----
-const dailyChores = [
-  "Kitchen, Dishes, Dining",
-  "Dogs (Food, Water, Porch)",
-  "Trash, Grill",
-  "Driveway, Deck, Denali"
-];
+    const sheetUrl =
+      "https://docs.google.com/spreadsheets/d/" +
+      SHEET_ID +
+      "/gviz/tq?sheet=" +
+      encodeURIComponent(SHEET_NAME);
 
-const dailySchedule = [
-  // Kitchen
-  { Sun: "Turner", Mon: "Miles",   Tue: "Stewart", Wed: "Emmitt", Thu: "Miles",   Fri: "Stewart", Sat: "Emmitt" },
-  // Dogs
-  { Sun: "Miles",  Mon: "Stewart", Tue: "Emmitt",  Wed: "Turner", Thu: "Stewart", Fri: "Emmitt",  Sat: "Turner" },
-  // Trash
-  { Sun: "Stewart",Mon: "Emmitt",  Tue: "Turner",  Wed: "Miles",  Thu: "Emmitt",  Fri: "Turner",  Sat: "Miles" },
-  // Driveway, deck, Mom’s car
-  { Sun: "Emmitt", Mon: "Turner",  Tue: "Miles",   Wed: "Stewart",Thu: "Turner",  Fri: "Miles",   Sat: "Stewart" }
-];
-
-// ---- WEEKLY SCHEDULE ----
-const weeklyWeeks = ["Week 1", "Week 2", "Week 3", "Week 4"];
-
-const weeklyChores = [
-  "Floors, Family, Living, Upstairs",
-  "Pool",
-  "Bathrooms",
-  "Towels (Wash Fold Place)"
-];
-
-// Rotation: each boy gets each chore once over 4 weeks
-const weeklySchedule = [
-  // Family, living, hall, upstairs and floors
-  { "Week 1": "Miles",   "Week 2": "Stewart", "Week 3": "Turner",  "Week 4": "Emmitt" },
-  // Pool
-  { "Week 1": "Emmitt",  "Week 2": "Miles",   "Week 3": "Stewart", "Week 4": "Turner" },
-  // Bathrooms
-  { "Week 1": "Turner",  "Week 2": "Emmitt",  "Week 3": "Miles",   "Week 4": "Stewart" },
-  // Towels (wash, fold, put away)
-  { "Week 1": "Stewart", "Week 2": "Turner",  "Week 3": "Emmitt",  "Week 4": "Miles" }
-];
-
-// ---- BUILD BOY PILLS ----
-const boyRow = document.getElementById("boys");
-
-function makePill(label, boyName = null) {
-  const pill = document.createElement("div");
-  pill.className = "label-pill";
-  pill.textContent = label;
-  pill.dataset.boy = boyName ? boyName : "All";
-  pill.addEventListener("click", () => {
-    setActiveBoy(boyName);
-  });
-  boyRow.appendChild(pill);
-}
-
-makePill("All", null);
-["Emmitt","Turner","Miles","Stewart"].forEach(name => makePill(name, name));
-
-// ---- TABLE BUILDERS ----
-function buildDailyTable() {
-  let html = "<table><tr><th>Chore</th>";
-  days.forEach(d => html += `<th>${d}</th>`);
-  html += "</tr>";
-
-  dailyChores.forEach((chore, i) => {
-    const rowSched = dailySchedule[i];
-    html += `<tr><td>${chore}</td>`;
-    days.forEach(d => {
-      const boy = rowSched[d];
-      html += `<td class="boy-cell" data-boy="${boy}">${boy}</td>`;
-    });
-    html += "</tr>";
-  });
-
-  html += "</table>";
-  document.getElementById("daily").innerHTML = html;
-}
-
-function buildWeeklyTable() {
-  let html = "<table><tr><th>Chore</th>";
-  weeklyWeeks.forEach(w => html += `<th data-week="${w}">${w}</th>`);
-  html += "</tr>";
-
-  weeklyChores.forEach((chore, i) => {
-    const rowSched = weeklySchedule[i];
-    html += `<tr><td>${chore}</td>`;
-    weeklyWeeks.forEach(w => {
-      const boy = rowSched[w];
-      html += `<td class="boy-cell weekly-cell" data-boy="${boy}" data-week="${w}">${boy}</td>`;
-    });
-    html += "</tr>";
-  });
-
-  html += "</table>";
-  document.getElementById("weekly").innerHTML = html;
-}
-
-buildDailyTable();
-buildWeeklyTable();
-
-// ---- CURRENT WEEK COLUMN HIGHLIGHT ----
-
-// Helper to strip time (midnight local) to avoid TZ drift
-function stripTime(date) {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-}
-
-// Returns 0–3 for Week 1–4 based on a 4-week cycle.
-// Anchor: Sunday Nov 23, 2025 = Week 1
-// This makes Sunday Dec 7, 2025 = Week 3 as requested.
-function getCurrentWeekIndex() {
-  const today = stripTime(new Date());
-  const cycleStart = stripTime(new Date(2025, 10, 23)); // Month 10 = November
-  const msPerWeek = 7 * 24 * 60 * 60 * 1000;
-
-  const diffMs = today - cycleStart;
-  const diffWeeks = Math.floor(diffMs / msPerWeek);
-
-  // Safe modulo for negatives
-  const index = ((diffWeeks % 4) + 4) % 4;
-  return index; // 0..3 → Week 1..4
-}
-
-function highlightCurrentWeekColumn() {
-  const weekIndex = getCurrentWeekIndex();
-  const weekName = weeklyWeeks[weekIndex];
-
-  // Header highlight
-  document.querySelectorAll("#weekly th[data-week]").forEach(th => {
-    if (th.getAttribute("data-week") === weekName) {
-      th.classList.add("week-current-header");
-    }
-  });
-
-  // Cell highlight
-  document.querySelectorAll(`#weekly td.weekly-cell[data-week="${weekName}"]`).forEach(td => {
-    td.classList.add("week-current-cell");
-  });
-}
-
-highlightCurrentWeekColumn();
-
-// ---- HIGHLIGHT LOGIC FOR BOYS ----
-function cssVarValue(varName) {
-  return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
-}
-
-function setActiveBoy(boyName) {
-  // Pill state
-  document.querySelectorAll(".label-pill").forEach(pill => {
-    const pillBoy = pill.dataset.boy;
-    const isAll = pillBoy === "All";
-    const isActive =
-      (boyName === null && isAll) ||
-      (boyName !== null && pillBoy === boyName);
-
-    pill.classList.toggle("active", isActive);
-    if (boyName && pillBoy === boyName) {
-      const color = cssVarValue(boyColorVars[boyName]);
-      pill.style.setProperty("--current-color", color);
-    } else if (!boyName && isAll) {
-      pill.style.removeProperty("--current-color");
-    }
-  });
-
-  // Cell state
-  const cells = document.querySelectorAll(".boy-cell");
-  cells.forEach(cell => {
-    cell.classList.remove("dim","highlight");
-    cell.style.backgroundColor = "";
-    cell.style.color = "";
-
-    if (!boyName) {
-      return; // All = reset
+    function setLoading(message) {
+      choresContainer.innerHTML = '<p class="loading">' + message + "</p>";
     }
 
-    if (cell.dataset.boy === boyName) {
-      const color = cssVarValue(boyColorVars[boyName]);
-      cell.classList.add("highlight");
-      cell.style.backgroundColor = color;
-      cell.style.color = "#000000";
-    } else {
-      cell.classList.add("dim");
+    function setError(message) {
+      choresContainer.innerHTML = '<p class="error-state">' + message + "</p>";
     }
-  });
-}
 
-// Default: All
-setActiveBoy(null);
+    function renderChores(filterKid) {
+      const kidFilter = filterKid || "all";
+      let data = todaysChores;
+
+      if (kidFilter !== "all") {
+        data = data.filter(row => row.kid === kidFilter);
+      }
+
+      if (!data.length) {
+        choresContainer.innerHTML =
+          '<p class="empty-state">No chores found for this selection. Either Dad messed up the sheet or it\'s a free day.</p>';
+        return;
+      }
+
+      const cardsHtml = data
+        .map(row => {
+          const kidClass = "kid-" + row.kid.replace(/\s+/g, "");
+          return `
+            <div class="chore-card ${kidClass}">
+              <div class="chore-kid">${row.kid}</div>
+              <div class="chore-daily">
+                <span class="chore-label">Daily:</span> ${row.dailyChore || "—"}
+              </div>
+              <div class="chore-weekly">
+                <span class="chore-label">Weekly:</span> ${row.weeklyChore || "—"}
+              </div>
+              <div class="chore-date">${row.date}</div>
+            </div>
+          `;
+        })
+        .join("");
+
+      choresContainer.innerHTML = cardsHtml;
+    }
+
+    function attachFilters() {
+      filterButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          filterButtons.forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          const kid = btn.getAttribute("data-kid");
+          renderChores(kid);
+        });
+      });
+    }
+
+    function parseSheetResponse(text) {
+      // gviz returns JS, not pure JSON. We need to strip the wrapper.
+      const jsonText = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
+      const obj = JSON.parse(jsonText);
+
+      const rows = obj.table.rows || [];
+      return rows.map(r => {
+        const c = r.c || [];
+        return {
+          date: c[0]?.f || c[0]?.v || "",
+          kid: c[1]?.v || "",
+          dailyChore: c[2]?.v || "",
+          weeklyChore: c[3]?.v || "",
+          phone: c[4]?.v || "",
+          todayFlag: (c[5]?.v || "").toString().trim()
+        };
+      });
+    }
+
+    async function loadChores() {
+      try {
+        setLoading("Loading chores from the spreadsheet…");
+        const res = await fetch(sheetUrl);
+        const text = await res.text();
+
+        const allRows = parseSheetResponse(text);
+
+        // Only show rows where Today column = "Yes"
+        todaysChores = allRows.filter(
+          row => row.todayFlag.toLowerCase() === "yes"
+        );
+
+        if (!todaysChores.length) {
+          choresContainer.innerHTML =
+            '<p class="empty-state">No rows are marked "Yes" in the Today column. Check the Google Sheet.</p>';
+          return;
+        }
+
+        renderChores("all");
+      } catch (err) {
+        console.error("Error loading sheet", err);
+        setError("Could not load chores from Google Sheets. Tell Dad to fix it.");
+      }
+    }
+
+    attachFilters();
+    loadChores();
+  })();
 </script>
-
-</body>
-</html>
