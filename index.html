@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Forced Labor – Chore Chart</title>
+
+<!-- Manifest -->
+<link rel="manifest" href="manifest.json" />
+
+<!-- iPhone / iPad Home Screen Icon -->
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="Forced Labor" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<meta name="theme-color" content="#000000" />
+
+<style>
+:root {
+  --bg: #111;
+  --card-bg: #1a1a1a;
+  --border: #444;
+  --text: #e5e5e5;
+
+  --emmitt: #3FBF6B;
+  --turner: #2684FF;
+  --miles: #E5A72B;
+  --stewart: #C852FF;
+  --today: #F64C4C;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  padding: 20px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+h1 {
+  text-align: center;
+  font-size: 32px;
+  margin-bottom: 20px;
+}
+
+.card {
+  background: var(--card-bg);
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  border: 1px solid var(--border);
+}
+
+.label-pill {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 22px;
+  font-size: 14px;
+  margin: 4px;
+  background: #333;
+  cursor: pointer;
+}
+
+.label-pill.active {
+  color: black;
+  background: var(--current-color);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+td, th {
+  border: 1px solid #333;
+  padding: 10px;
+  text-align: center;
+}
+
+.today {
+  background: var(--today);
+  color: #fff;
+  font-weight: bold;
+}
+</style>
+
+</head>
+<body>
+
+<h1>Forced Labor Chore Chart</h1>
+
+<div class="card">
+  <h2>Select Worker</h2>
+  <div id="boys"></div>
+</div>
+
+<div class="card">
+  <h2>Daily Chores</h2>
+  <div id="daily"></div>
+</div>
+
+<div class="card">
+  <h2>Weekly Chores</h2>
+  <div id="weekly"></div>
+</div>
+
+<script>
+const boys = {
+  Emmitt: "var(--emmitt)",
+  Turner: "var(--turner)",
+  Miles: "var(--miles)",
+  Stewart: "var(--stewart)"
+};
+
+const dailyChores = [
+  "Kitchen (dishes, countertops, dining room)",
+  "Dogs (food, water, back porch)",
+  "Trash, grill",
+  "Driveway, deck, Mom’s car"
+];
+
+const weeklyChores = [
+  "Bathrooms",
+  "Vacuum + Mop",
+  "Laundry Room",
+  "Mirrors & Windows",
+  "Dusting"
+];
+
+// Insert boy buttons
+const boyDiv = document.getElementById("boys");
+Object.keys(boys).forEach(b => {
+  const pill = document.createElement("div");
+  pill.className = "label-pill";
+  pill.textContent = b;
+  pill.onclick = () => {
+    document.querySelectorAll(".label-pill").forEach(x => x.classList.remove("active"));
+    pill.classList.add("active");
+    pill.style.setProperty("--current-color", boys[b]);
+  };
+  boyDiv.appendChild(pill);
+});
+
+// Build tables
+function buildTable(list, containerId) {
+  let html = "<table><tr><th>Chore</th><th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th></tr>";
+  list.forEach((chore) => {
+    html += `<tr><td>${chore}</td>
+      <td>Turner</td><td>Miles</td><td>Stewart</td><td>Emmitt</td><td>Miles</td><td>Stewart</td><td>Emmitt</td>
+    </tr>`;
+  });
+  html += "</table>";
+  document.getElementById(containerId).innerHTML = html;
+}
+
+buildTable(dailyChores, "daily");
+buildTable(weeklyChores, "weekly");
+</script>
+
+</body>
+</html>
