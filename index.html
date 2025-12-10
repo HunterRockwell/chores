@@ -26,7 +26,6 @@
   --turner: #2684ff;
   --miles: #e5a72b;
   --stewart: #c852ff;
-  --today: #f64c4c;
 }
 
 * {
@@ -124,8 +123,6 @@ td:first-child {
 }
 
 .boy-cell.highlight {
-  background: #f5c04c;
-  color: #000000;
   font-weight: 600;
 }
 
@@ -178,27 +175,18 @@ td:first-child {
 </div>
 
 <script>
-// Colors for each boy
-const boys = {
-  Emmitt: "var(--emmitt)",
-  Turner: "var(--turner)",
-  Miles: "var(--miles)",
-  Stewart: "var(--stewart)"
+// Color map for each boy (CSS custom properties)
+const boyColorVars = {
+  Emmitt: "--emmitt",
+  Turner: "--turner",
+  Miles: "--miles",
+  Stewart: "--stewart"
 };
 
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-// Same rotation pattern you used in the sheet
-const dailyAssignments = {
-  Sun: "Turner",
-  Mon: "Miles",
-  Tue: "Stewart",
-  Wed: "Emmitt",
-  Thu: "Miles",
-  Fri: "Stewart",
-  Sat: "Emmitt"
-};
-
+// ---- DAILY SCHEDULE ----
+// One object per row (in order of dailyChores)
 const dailyChores = [
   "Kitchen (dishes, countertops, dining room)",
   "Dogs (food, water, back porch)",
@@ -206,26 +194,50 @@ const dailyChores = [
   "Driveway, deck, Mom’s car"
 ];
 
+const dailySchedule = [
+  // Kitchen row
+  { Sun: "Turner", Mon: "Miles",   Tue: "Stewart", Wed: "Emmitt", Thu: "Miles",   Fri: "Stewart", Sat: "Emmitt" },
+  // Dogs row
+  { Sun: "Miles",  Mon: "Stewart", Tue: "Emmitt",  Wed: "Turner", Thu: "Stewart", Fri: "Emmitt",  Sat: "Turner" },
+  // Trash row
+  { Sun: "Stewart",Mon: "Emmitt",  Tue: "Turner",  Wed: "Miles",  Thu: "Emmitt",  Fri: "Turner",  Sat: "Miles" },
+  // Driveway row
+  { Sun: "Emmitt", Mon: "Turner",  Tue: "Miles",   Wed: "Stewart",Thu: "Turner",  Fri: "Miles",   Sat: "Stewart" }
+];
+
+// ---- WEEKLY SCHEDULE ----
+// 4 weeks instead of days, one chore per boy per week.
+const weeklyWeeks = ["Week 1", "Week 2", "Week 3", "Week 4"];
+
 const weeklyChores = [
-  "Bathrooms",
-  "Vacuum + Mop",
-  "Laundry Room",
+  "Family room / TV area",
+  "Floors (vacuum + mop)",
+  "Laundry room",
   "Mirrors & Windows",
   "Dusting"
 ];
 
-// Build boy selector pills (All + each boy)
+const weeklySchedule = [
+  // Family room
+  { "Week 1": "Stewart", "Week 2": "Emmitt", "Week 3": "Turner",  "Week 4": "Miles" },
+  // Floors
+  { "Week 1": "Miles",   "Week 2": "Stewart","Week 3": "Emmitt", "Week 4": "Turner" },
+  // Laundry
+  { "Week 1": "Turner",  "Week 2": "Miles",  "Week 3": "Stewart","Week 4": "Emmitt" },
+  // Mirrors & Windows
+  { "Week 1": "Emmitt",  "Week 2": "Turner", "Week 3": "Miles",  "Week 4": "Stewart" },
+  // Dusting
+  { "Week 1": "Stewart", "Week 2": "Emmitt", "Week 3": "Turner", "Week 4": "Miles" }
+];
+
+// ---- BUILD BOY PILLS ----
 const boyRow = document.getElementById("boys");
 
 function makePill(label, boyName = null) {
   const pill = document.createElement("div");
   pill.className = "label-pill";
   pill.textContent = label;
-  if (boyName) {
-    pill.dataset.boy = boyName;
-  } else {
-    pill.dataset.boy = "All";
-  }
+  pill.dataset.boy = boyName ? boyName : "All";
   pill.addEventListener("click", () => {
     setActiveBoy(boyName);
   });
@@ -233,35 +245,57 @@ function makePill(label, boyName = null) {
 }
 
 makePill("All", null);
-Object.keys(boys).forEach(name => makePill(name, name));
+["Emmitt","Turner","Miles","Stewart"].forEach(name => makePill(name, name));
 
-// Build tables with data-boy attributes
-function buildTable(chores, containerId, assignments) {
+// ---- TABLE BUILDERS ----
+function buildDailyTable() {
   let html = "<table><tr><th>Chore</th>";
-  days.forEach(d => {
-    html += `<th>${d}</th>`;
-  });
+  days.forEach(d => html += `<th>${d}</th>`);
   html += "</tr>";
 
-  chores.forEach(chore => {
+  dailyChores.forEach((chore, i) => {
+    const rowSched = dailySchedule[i];
     html += `<tr><td>${chore}</td>`;
     days.forEach(d => {
-      const boy = assignments[d];
+      const boy = rowSched[d];
       html += `<td class="boy-cell" data-boy="${boy}">${boy}</td>`;
     });
     html += "</tr>";
   });
 
   html += "</table>";
-  document.getElementById(containerId).innerHTML = html;
+  document.getElementById("daily").innerHTML = html;
 }
 
-buildTable(dailyChores, "daily", dailyAssignments);
-buildTable(weeklyChores, "weekly", dailyAssignments);
+function buildWeeklyTable() {
+  let html = "<table><tr><th>Chore</th>";
+  weeklyWeeks.forEach(w => html += `<th>${w}</th>`);
+  html += "</tr>";
 
-// Highlight logic
+  weeklyChores.forEach((chore, i) => {
+    const rowSched = weeklySchedule[i];
+    html += `<tr><td>${chore}</td>`;
+    weeklyWeeks.forEach(w => {
+      const boy = rowSched[w];
+      html += `<td class="boy-cell" data-boy="${boy}">${boy}</td>`;
+    });
+    html += "</tr>";
+  });
+
+  html += "</table>";
+  document.getElementById("weekly").innerHTML = html;
+}
+
+buildDailyTable();
+buildWeeklyTable();
+
+// ---- HIGHLIGHT LOGIC ----
+function cssVarValue(varName) {
+  return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+}
+
 function setActiveBoy(boyName) {
-  // Update pill styles
+  // Pill state
   document.querySelectorAll(".label-pill").forEach(pill => {
     const pillBoy = pill.dataset.boy;
     const isAll = pillBoy === "All";
@@ -271,27 +305,35 @@ function setActiveBoy(boyName) {
 
     pill.classList.toggle("active", isActive);
     if (boyName && pillBoy === boyName) {
-      pill.style.setProperty("--current-color", boys[boyName]);
+      const color = cssVarValue(boyColorVars[boyName]);
+      pill.style.setProperty("--current-color", color);
     }
   });
 
-  // Update table cells
+  // Cell state
   const cells = document.querySelectorAll(".boy-cell");
   cells.forEach(cell => {
-    cell.classList.remove("dim", "highlight");
+    cell.classList.remove("dim","highlight");
+    cell.style.backgroundColor = "";
+    cell.style.color = "";
+
     if (!boyName) {
-      // All = normal
+      // All = reset
       return;
     }
+
     if (cell.dataset.boy === boyName) {
+      const color = cssVarValue(boyColorVars[boyName]);
       cell.classList.add("highlight");
+      cell.style.backgroundColor = color;
+      cell.style.color = "#000000";
     } else {
       cell.classList.add("dim");
     }
   });
 }
 
-// Default state: All selected
+// Default: All
 setActiveBoy(null);
 </script>
 
