@@ -48,11 +48,24 @@
   }
 
   .filter-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1.1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.1rem;
+}
+
+/* Mobile: keep chips on one line with horizontal scroll */
+@media (max-width: 600px) {
+  .filter-buttons {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
   }
+
+  .filter-buttons::-webkit-scrollbar {
+    display: none; /* Hide ugly scrollbar in iOS */
+  }
+}
 
   .filter-btn {
     border: 1px solid #ddd;
@@ -137,42 +150,37 @@
 
   /* 📱 Mobile: make it feel like an app */
   @media (max-width: 600px) {
-    .forced-labor-app {
-      padding: 1.25rem 1.1rem 2.5rem;
-    }
 
-    .forced-labor-app h1 {
-      font-size: 1.9rem;
-    }
-
-    .current-date {
-      font-size: 1rem;
-    }
-
-    .filter-btn {
-      font-size: 0.95rem;
-      padding: 0.45rem 0.95rem;
-    }
-
-    .chores-container {
-      width: 100%;        /* use full width on phone */
-      gap: 0.9rem;
-    }
-
-    .chore-card {
-      padding: 1rem 1.2rem;
-      font-size: 1rem;
-    }
-
-    .chore-daily,
-    .chore-weekly {
-      font-size: 1rem;
-    }
-
-    .chore-date {
-      font-size: 0.9rem;
-    }
+  .forced-labor-app {
+    max-width: 100%;
+    padding: 1.25rem 1.25rem 1.75rem;
   }
+
+  .forced-labor-app h1 {
+    font-size: 1.9rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .current-date {
+    font-size: 1.05rem;
+    margin-bottom: 1rem;
+  }
+
+  .chore-card {
+    font-size: 1rem;
+    padding: 0.9rem 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .chore-card h3 {
+    font-size: 1.15rem;
+  }
+
+  .chore-card p {
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+}
 </style>
 
 <script>
