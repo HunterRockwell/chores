@@ -26,6 +26,8 @@
   --turner: #3fbf6b;
   --miles: #c852ff;
   --stewart: #e5a72b;
+
+  --week-border: #facc15;
 }
 
 * {
@@ -126,6 +128,13 @@ td:first-child {
   font-weight: 600;
 }
 
+/* Weekly current-week column highlight */
+.week-current-header,
+.week-current-cell {
+  box-shadow: inset 0 0 0 1px var(--week-border);
+  border-color: var(--week-border);
+}
+
 @media (max-width: 640px) {
   body {
     padding: 12px;
@@ -212,7 +221,7 @@ const weeklyChores = [
   "Towels (Wash Fold Place)"
 ];
 
-// Latin-square style rotation: each boy gets each chore once over 4 weeks
+// Rotation: each boy gets each chore once over 4 weeks
 const weeklySchedule = [
   // Family, living, hall, upstairs and floors
   { "Week 1": "Miles",   "Week 2": "Stewart", "Week 3": "Turner",  "Week 4": "Emmitt" },
@@ -263,7 +272,7 @@ function buildDailyTable() {
 
 function buildWeeklyTable() {
   let html = "<table><tr><th>Chore</th>";
-  weeklyWeeks.forEach(w => html += `<th>${w}</th>`);
+  weeklyWeeks.forEach(w => html += `<th data-week="${w}">${w}</th>`);
   html += "</tr>";
 
   weeklyChores.forEach((chore, i) => {
@@ -271,7 +280,7 @@ function buildWeeklyTable() {
     html += `<tr><td>${chore}</td>`;
     weeklyWeeks.forEach(w => {
       const boy = rowSched[w];
-      html += `<td class="boy-cell" data-boy="${boy}">${boy}</td>`;
+      html += `<td class="boy-cell weekly-cell" data-boy="${boy}" data-week="${w}">${boy}</td>`;
     });
     html += "</tr>";
   });
@@ -283,7 +292,49 @@ function buildWeeklyTable() {
 buildDailyTable();
 buildWeeklyTable();
 
-// ---- HIGHLIGHT LOGIC ----
+// ---- CURRENT WEEK COLUMN HIGHLIGHT ----
+
+// Helper to strip time (midnight local) to avoid TZ drift
+function stripTime(date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+// Returns 0–3 for Week 1–4 based on a 4-week cycle.
+// Anchor: Sunday Nov 23, 2025 = Week 1
+// This makes Sunday Dec 7, 2025 = Week 3 as requested.
+function getCurrentWeekIndex() {
+  const today = stripTime(new Date());
+  const cycleStart = stripTime(new Date(2025, 10, 23)); // Month 10 = November
+  const msPerWeek = 7 * 24 * 60 * 60 * 1000;
+
+  const diffMs = today - cycleStart;
+  const diffWeeks = Math.floor(diffMs / msPerWeek);
+
+  // Safe modulo for negatives
+  const index = ((diffWeeks % 4) + 4) % 4;
+  return index; // 0..3 → Week 1..4
+}
+
+function highlightCurrentWeekColumn() {
+  const weekIndex = getCurrentWeekIndex();
+  const weekName = weeklyWeeks[weekIndex];
+
+  // Header highlight
+  document.querySelectorAll("#weekly th[data-week]").forEach(th => {
+    if (th.getAttribute("data-week") === weekName) {
+      th.classList.add("week-current-header");
+    }
+  });
+
+  // Cell highlight
+  document.querySelectorAll(`#weekly td.weekly-cell[data-week="${weekName}"]`).forEach(td => {
+    td.classList.add("week-current-cell");
+  });
+}
+
+highlightCurrentWeekColumn();
+
+// ---- HIGHLIGHT LOGIC FOR BOYS ----
 function cssVarValue(varName) {
   return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
 }
@@ -301,6 +352,8 @@ function setActiveBoy(boyName) {
     if (boyName && pillBoy === boyName) {
       const color = cssVarValue(boyColorVars[boyName]);
       pill.style.setProperty("--current-color", color);
+    } else if (!boyName && isAll) {
+      pill.style.removeProperty("--current-color");
     }
   });
 
