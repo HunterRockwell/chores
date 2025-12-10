@@ -169,7 +169,7 @@ td:first-child {
 <div class="card">
   <h2>Weekly Chores</h2>
   <p style="margin:0 0 6px;font-size:13px;color:#bbbbbb;">
-    Same rotation pattern for weekly work.
+    Week-by-week rotation for bigger jobs.
   </p>
   <div id="weekly"></div>
 </div>
@@ -186,7 +186,6 @@ const boyColorVars = {
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 // ---- DAILY SCHEDULE ----
-// One object per row (in order of dailyChores)
 const dailyChores = [
   "Kitchen (dishes, countertops, dining room)",
   "Dogs (food, water, back porch)",
@@ -195,39 +194,36 @@ const dailyChores = [
 ];
 
 const dailySchedule = [
-  // Kitchen row
+  // Kitchen
   { Sun: "Turner", Mon: "Miles",   Tue: "Stewart", Wed: "Emmitt", Thu: "Miles",   Fri: "Stewart", Sat: "Emmitt" },
-  // Dogs row
+  // Dogs
   { Sun: "Miles",  Mon: "Stewart", Tue: "Emmitt",  Wed: "Turner", Thu: "Stewart", Fri: "Emmitt",  Sat: "Turner" },
-  // Trash row
+  // Trash
   { Sun: "Stewart",Mon: "Emmitt",  Tue: "Turner",  Wed: "Miles",  Thu: "Emmitt",  Fri: "Turner",  Sat: "Miles" },
-  // Driveway row
+  // Driveway, deck, Mom’s car
   { Sun: "Emmitt", Mon: "Turner",  Tue: "Miles",   Wed: "Stewart",Thu: "Turner",  Fri: "Miles",   Sat: "Stewart" }
 ];
 
 // ---- WEEKLY SCHEDULE ----
-// 4 weeks instead of days, one chore per boy per week.
 const weeklyWeeks = ["Week 1", "Week 2", "Week 3", "Week 4"];
 
 const weeklyChores = [
-  "Family room / TV area",
-  "Floors (vacuum + mop)",
-  "Laundry room",
-  "Mirrors & Windows",
-  "Dusting"
+  "Family, living, hall, upstairs and floors",
+  "Pool",
+  "Bathrooms",
+  "Towels (wash, fold, put away)"
 ];
 
+// Latin-square style rotation: each boy gets each chore once over 4 weeks
 const weeklySchedule = [
-  // Family room
-  { "Week 1": "Stewart", "Week 2": "Emmitt", "Week 3": "Turner",  "Week 4": "Miles" },
-  // Floors
-  { "Week 1": "Miles",   "Week 2": "Stewart","Week 3": "Emmitt", "Week 4": "Turner" },
-  // Laundry
-  { "Week 1": "Turner",  "Week 2": "Miles",  "Week 3": "Stewart","Week 4": "Emmitt" },
-  // Mirrors & Windows
-  { "Week 1": "Emmitt",  "Week 2": "Turner", "Week 3": "Miles",  "Week 4": "Stewart" },
-  // Dusting
-  { "Week 1": "Stewart", "Week 2": "Emmitt", "Week 3": "Turner", "Week 4": "Miles" }
+  // Family / living / hall / upstairs / floors
+  { "Week 1": "Emmitt", "Week 2": "Turner",  "Week 3": "Miles",   "Week 4": "Stewart" },
+  // Pool
+  { "Week 1": "Turner", "Week 2": "Miles",   "Week 3": "Stewart", "Week 4": "Emmitt" },
+  // Bathrooms
+  { "Week 1": "Miles",  "Week 2": "Stewart", "Week 3": "Emmitt",  "Week 4": "Turner" },
+  // Towels
+  { "Week 1": "Stewart","Week 2": "Emmitt",  "Week 3": "Turner",  "Week 4": "Miles" }
 ];
 
 // ---- BUILD BOY PILLS ----
@@ -318,8 +314,7 @@ function setActiveBoy(boyName) {
     cell.style.color = "";
 
     if (!boyName) {
-      // All = reset
-      return;
+      return; // All = reset
     }
 
     if (cell.dataset.boy === boyName) {
