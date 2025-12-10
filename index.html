@@ -1,6 +1,6 @@
 <div class="forced-labor-app">
   <h1>Forced Labor</h1>
-  <p class="subtitle">Daily chore assignments pulled live from Dad's master sheet.</p>
+  <p id="chore-date" class="current-date"></p>
 
   <div class="filter-buttons">
     <button class="filter-btn active" data-kid="all">All</button>
@@ -13,10 +13,6 @@
   <div id="chores-container" class="chores-container">
     <p class="loading">Loading chores from Google Sheets…</p>
   </div>
-
-  <p class="footer-note">
-    Full chart: <a href="https://naturalkaos.com/chorechart" target="_blank" rel="noopener">naturalkaos.com/chorechart</a>
-  </p>
 </div>
 
 <style>
@@ -32,7 +28,8 @@
     margin-bottom: 0.25rem;
   }
 
-  .subtitle {
+  .current-date {
+    font-size: 0.95rem;
     color: #555;
     margin-bottom: 1rem;
   }
@@ -59,10 +56,13 @@
     border-color: #222;
   }
 
+  /* STACK CARDS VERTICALLY */
   .chores-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    display: flex;
+    flex-direction: column;
     gap: 0.75rem;
+    max-width: 520px;
+    margin: 0 auto;
   }
 
   .chore-card {
@@ -97,23 +97,12 @@
   .loading,
   .empty-state,
   .error-state {
-    grid-column: 1 / -1;
     font-size: 0.95rem;
     color: #666;
   }
 
   .error-state {
     color: #b00020;
-  }
-
-  .footer-note {
-    margin-top: 1.25rem;
-    font-size: 0.8rem;
-    color: #777;
-  }
-
-  .footer-note a {
-    color: #0066cc;
   }
 
   /* Color accents by kid */
@@ -133,13 +122,24 @@
 
 <script>
   (function () {
-    // TODO: PUT YOUR REAL SHEET ID HERE
-    const SHEET_ID = "1qQEGcKsi5SW6xiZZXkZbV5rY8x7Hs1ImXt8lIXN_uzE";
+    // KEEP YOUR REAL SHEET ID HERE
+    const SHEET_ID = "PASTE_YOUR_SHEET_ID_HERE";
     const SHEET_NAME = "Chores";
 
     const choresContainer = document.getElementById("chores-container");
     const filterButtons = document.querySelectorAll(".filter-btn");
+    const dateEl = document.getElementById("chore-date");
     let todaysChores = [];
+
+    // Set today's date under the title
+    const now = new Date();
+    const dateOptions = {
+      weekday: "long",
+      month: "short",
+      day: "numeric",
+      year: "numeric"
+    };
+    dateEl.textContent = now.toLocaleDateString(undefined, dateOptions);
 
     const sheetUrl =
       "https://docs.google.com/spreadsheets/d/" +
@@ -202,7 +202,6 @@
     }
 
     function parseSheetResponse(text) {
-      // gviz returns JS, not pure JSON. We need to strip the wrapper.
       const jsonText = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
       const obj = JSON.parse(jsonText);
 
@@ -228,7 +227,7 @@
 
         const allRows = parseSheetResponse(text);
 
-        // Only show rows where Today column = "Yes"
+        // Only rows where Today column = "Yes"
         todaysChores = allRows.filter(
           row => row.todayFlag.toLowerCase() === "yes"
         );
