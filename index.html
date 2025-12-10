@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Forced Labor – Chore Chart</title>
 
-<!-- Manifest -->
+<!-- PWA / manifest -->
 <link rel="manifest" href="manifest.json" />
 
 <!-- iPhone / iPad Home Screen Icon -->
@@ -17,16 +17,16 @@
 
 <style>
 :root {
-  --bg: #111;
-  --card-bg: #1a1a1a;
-  --border: #444;
-  --text: #e5e5e5;
+  --bg: #111111;
+  --card-bg: #181818;
+  --border: #333333;
+  --text: #f0f0f0;
 
-  --emmitt: #3FBF6B;
-  --turner: #2684FF;
-  --miles: #E5A72B;
-  --stewart: #C852FF;
-  --today: #F64C4C;
+  --emmitt: #3fbf6b;
+  --turner: #2684ff;
+  --miles: #e5a72b;
+  --stewart: #c852ff;
+  --today: #f64c4c;
 }
 
 * {
@@ -36,63 +36,121 @@
 
 body {
   margin: 0;
+  padding: 20px;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Helvetica, Arial, sans-serif;
   background: var(--bg);
   color: var(--text);
-  padding: 20px;
-  max-width: 900px;
+  max-width: 960px;
   margin-left: auto;
   margin-right: auto;
 }
 
 h1 {
   text-align: center;
-  font-size: 32px;
-  margin-bottom: 20px;
+  font-size: 28px;
+  margin: 10px 0 24px;
+}
+
+h2 {
+  font-size: 18px;
+  margin: 0 0 12px;
 }
 
 .card {
   background: var(--card-bg);
-  padding: 20px;
-  border-radius: 12px;
-  margin-bottom: 30px;
+  border-radius: 14px;
   border: 1px solid var(--border);
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 18px 35px rgba(0,0,0,0.35);
+}
+
+.label-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .label-pill {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 8px 14px;
-  border-radius: 22px;
+  border-radius: 999px;
   font-size: 14px;
-  margin: 4px;
-  background: #333;
+  background: #262626;
+  border: 1px solid #3a3a3a;
   cursor: pointer;
+  user-select: none;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .label-pill.active {
-  color: black;
-  background: var(--current-color);
+  background: var(--current-color, #f0b429);
+  color: #000000;
+  border-color: transparent;
+  font-weight: 600;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
+  font-size: 13px;
 }
 
-td, th {
-  border: 1px solid #333;
-  padding: 10px;
+th, td {
+  border: 1px solid #262626;
+  padding: 8px 6px;
   text-align: center;
 }
 
-.today {
-  background: var(--today);
-  color: #fff;
-  font-weight: bold;
+th {
+  background: #1f1f1f;
+  font-weight: 600;
+}
+
+td:first-child {
+  text-align: left;
+}
+
+.boy-cell {
+  transition: background-color 0.18s ease, color 0.18s ease, opacity 0.18s ease;
+}
+
+.boy-cell.dim {
+  opacity: 0.25;
+}
+
+.boy-cell.highlight {
+  background: #f5c04c;
+  color: #000000;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  body {
+    padding: 12px;
+  }
+
+  h1 {
+    font-size: 22px;
+  }
+
+  .card {
+    padding: 14px;
+  }
+
+  table {
+    font-size: 11px;
+  }
+
+  th, td {
+    padding: 6px 4px;
+  }
 }
 </style>
-
 </head>
 <body>
 
@@ -100,25 +158,45 @@ td, th {
 
 <div class="card">
   <h2>Select Worker</h2>
-  <div id="boys"></div>
+  <div class="label-row" id="boys"></div>
 </div>
 
 <div class="card">
   <h2>Daily Chores</h2>
+  <p style="margin:0 0 6px;font-size:13px;color:#bbbbbb;">
+    Rotating by day of week. Tap a name above to highlight their jobs.
+  </p>
   <div id="daily"></div>
 </div>
 
 <div class="card">
   <h2>Weekly Chores</h2>
+  <p style="margin:0 0 6px;font-size:13px;color:#bbbbbb;">
+    Same rotation pattern for weekly work.
+  </p>
   <div id="weekly"></div>
 </div>
 
 <script>
+// Colors for each boy
 const boys = {
   Emmitt: "var(--emmitt)",
   Turner: "var(--turner)",
   Miles: "var(--miles)",
   Stewart: "var(--stewart)"
+};
+
+const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+// Same rotation pattern you used in the sheet
+const dailyAssignments = {
+  Sun: "Turner",
+  Mon: "Miles",
+  Tue: "Stewart",
+  Wed: "Emmitt",
+  Thu: "Miles",
+  Fri: "Stewart",
+  Sat: "Emmitt"
 };
 
 const dailyChores = [
@@ -136,34 +214,85 @@ const weeklyChores = [
   "Dusting"
 ];
 
-// Insert boy buttons
-const boyDiv = document.getElementById("boys");
-Object.keys(boys).forEach(b => {
+// Build boy selector pills (All + each boy)
+const boyRow = document.getElementById("boys");
+
+function makePill(label, boyName = null) {
   const pill = document.createElement("div");
   pill.className = "label-pill";
-  pill.textContent = b;
-  pill.onclick = () => {
-    document.querySelectorAll(".label-pill").forEach(x => x.classList.remove("active"));
-    pill.classList.add("active");
-    pill.style.setProperty("--current-color", boys[b]);
-  };
-  boyDiv.appendChild(pill);
-});
-
-// Build tables
-function buildTable(list, containerId) {
-  let html = "<table><tr><th>Chore</th><th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th></tr>";
-  list.forEach((chore) => {
-    html += `<tr><td>${chore}</td>
-      <td>Turner</td><td>Miles</td><td>Stewart</td><td>Emmitt</td><td>Miles</td><td>Stewart</td><td>Emmitt</td>
-    </tr>`;
+  pill.textContent = label;
+  if (boyName) {
+    pill.dataset.boy = boyName;
+  } else {
+    pill.dataset.boy = "All";
+  }
+  pill.addEventListener("click", () => {
+    setActiveBoy(boyName);
   });
+  boyRow.appendChild(pill);
+}
+
+makePill("All", null);
+Object.keys(boys).forEach(name => makePill(name, name));
+
+// Build tables with data-boy attributes
+function buildTable(chores, containerId, assignments) {
+  let html = "<table><tr><th>Chore</th>";
+  days.forEach(d => {
+    html += `<th>${d}</th>`;
+  });
+  html += "</tr>";
+
+  chores.forEach(chore => {
+    html += `<tr><td>${chore}</td>`;
+    days.forEach(d => {
+      const boy = assignments[d];
+      html += `<td class="boy-cell" data-boy="${boy}">${boy}</td>`;
+    });
+    html += "</tr>";
+  });
+
   html += "</table>";
   document.getElementById(containerId).innerHTML = html;
 }
 
-buildTable(dailyChores, "daily");
-buildTable(weeklyChores, "weekly");
+buildTable(dailyChores, "daily", dailyAssignments);
+buildTable(weeklyChores, "weekly", dailyAssignments);
+
+// Highlight logic
+function setActiveBoy(boyName) {
+  // Update pill styles
+  document.querySelectorAll(".label-pill").forEach(pill => {
+    const pillBoy = pill.dataset.boy;
+    const isAll = pillBoy === "All";
+    const isActive =
+      (boyName === null && isAll) ||
+      (boyName !== null && pillBoy === boyName);
+
+    pill.classList.toggle("active", isActive);
+    if (boyName && pillBoy === boyName) {
+      pill.style.setProperty("--current-color", boys[boyName]);
+    }
+  });
+
+  // Update table cells
+  const cells = document.querySelectorAll(".boy-cell");
+  cells.forEach(cell => {
+    cell.classList.remove("dim", "highlight");
+    if (!boyName) {
+      // All = normal
+      return;
+    }
+    if (cell.dataset.boy === boyName) {
+      cell.classList.add("highlight");
+    } else {
+      cell.classList.add("dim");
+    }
+  });
+}
+
+// Default state: All selected
+setActiveBoy(null);
 </script>
 
 </body>
