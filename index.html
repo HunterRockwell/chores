@@ -98,7 +98,6 @@
     .Turner { border-left-color: #3498db; }
     .Miles  { border-left-color: #1abc9c; }
     .Stewart { border-left-color: #9b59b6; }
-
   </style>
 </head>
 
@@ -128,6 +127,7 @@
   const choresContainer = document.getElementById("chores-container");
   const filterButtons = document.querySelectorAll(".filter-btn");
 
+  // Show today's date under the title
   function updateDate() {
     const now = new Date();
     choreDate.textContent = now.toLocaleDateString("en-US", {
@@ -139,6 +139,34 @@
   }
   updateDate();
 
+  // Format whatever crazy thing Sheets gives us into mm/dd/yyyy
+  function formatDisplayDate(raw) {
+    if (!raw) return "";
+
+    // If it's like "Date(2025,11,2)"
+    if (typeof raw === "string" && raw.startsWith("Date(")) {
+      const parts = raw.match(/\d+/g);
+      if (parts && parts.length >= 3) {
+        const y = Number(parts[0]);
+        const m = Number(parts[1]); // already zero-based in that string
+        const d = Number(parts[2]);
+        const js = new Date(y, m, d);
+        return js.toLocaleDateString("en-US");
+      }
+    }
+
+    // If it's a Sheets serial number
+    if (typeof raw === "number") {
+      const ms = (raw - 25569) * 86400 * 1000;
+      const js = new Date(ms);
+      return js.toLocaleDateString("en-US");
+    }
+
+    // Already human-readable
+    return String(raw);
+  }
+
+  // Parse the Google Sheets JSON
   function parseSheetResponse(text) {
     const jsonText = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
     const obj = JSON.parse(jsonText);
@@ -146,37 +174,52 @@
 
     return rows.map(r => {
       const c = r.c || [];
+      const dateCell = c[0];
+
+      let rawDate = "";
+      if (dateCell) {
+        if (dateCell.f) {
+          rawDate = dateCell.f;       // formatted string from Sheets
+        } else {
+          rawDate = dateCell.v;       // raw value
+        }
+      }
+
       return {
-        date: c[0]?.v || "",
+        date: formatDisplayDate(rawDate),
         kid: (c[1]?.v || "").trim(),
-        daily: c[2]?.v || "",
-        weekly: c[3]?.v || "",
+        dailyChore: c[2]?.v || "",
+        weeklyChore: c[3]?.v || "",
+        phone: c[4]?.v || "",
+        todayFlag: ((c[5]?.v || "") + "").trim()
       };
     });
   }
 
-  let allRows = [];
+  let visibleRows = [];
 
   function renderChores(kidFilter) {
     choresContainer.innerHTML = "";
 
-    const filtered = kidFilter === "all"
-      ? allRows
-      : allRows.filter(row => row.kid === kidFilter);
+    const rowsToShow =
+      kidFilter === "all"
+        ? visibleRows
+        : visibleRows.filter(row => row.kid === kidFilter);
 
-    if (!filtered.length) {
-      choresContainer.innerHTML = `<p>No chores found.</p>`;
+    if (!rowsToShow.length) {
+      choresContainer.innerHTML =
+        `<p>No rows are marked "Yes" in the Today column. Check the Google Sheet.</p>`;
       return;
     }
 
-    filtered.forEach(row => {
+    rowsToShow.forEach(row => {
       const card = document.createElement("div");
       card.className = `chore-card ${row.kid}`;
 
       card.innerHTML = `
         <div class="chore-kid">${row.kid}</div>
-        <div class="chore-daily"><strong>Daily:</strong> ${row.daily}</div>
-        <div class="chore-weekly"><strong>Weekly:</strong> ${row.weekly}</div>
+        <div class="chore-daily"><strong>Daily:</strong> ${row.dailyChore}</div>
+        <div class="chore-weekly"><strong>Weekly:</strong> ${row.weeklyChore}</div>
         <div class="chore-date">${row.date}</div>
       `;
 
@@ -189,7 +232,6 @@
       btn.addEventListener("click", () => {
         document.querySelector(".filter-btn.active").classList.remove("active");
         btn.classList.add("active");
-
         const kid = btn.dataset.kid;
         renderChores(kid);
       });
@@ -200,18 +242,29 @@
     try {
       const res = await fetch(sheetUrl);
       const text = await res.text();
-      allRows = parseSheetResponse(text);
+      const allRows = parseSheetResponse(text);
+
+      // Only rows where Today column == "Yes"
+      visibleRows = allRows.filter(
+        row => row.todayFlag.toLowerCase() === "yes"
+      );
+
+      if (!visibleRows.length) {
+        choresContainer.innerHTML =
+          `<p>No rows are marked "Yes" in the Today column. Check the Google Sheet.</p>`;
+        return;
+      }
 
       renderChores("all");
     } catch (err) {
-      console.error(err);
-      choresContainer.innerHTML = `<p style="color:red;">Could not load chores from Google Sheets. Tell Dad to fix it.</p>`;
+      console.error("Error loading sheet", err);
+      choresContainer.innerHTML =
+        `<p style="color:red;">Could not load chores from Google Sheets. Tell Dad to fix it.</p>`;
     }
   }
 
   attachFilters();
   loadChores();
-
 </script>
 
 </body>
