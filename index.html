@@ -2,270 +2,370 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
 
-  <!-- Title -->
+  <!-- PWA manifest & icons -->
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- iOS will use this root-level icon -->
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <!-- Extra sizes for other platforms -->
+  <link
+    rel="apple-touch-icon"
+    sizes="192x192"
+    href="icons/forced-labor-icon-192.png"
+  />
+
   <title>Forced Labor</title>
 
-  <!-- PWA manifest & Apple Touch Icon -->
-  <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" href="icons/forced-labor-icon-192.png" />
-
   <style>
+    :root {
+      --bg: #f5f5f7;
+      --card-bg: #ffffff;
+      --chip-bg: #f2f2f2;
+      --chip-active-bg: #000000;
+      --chip-text: #007aff;
+      --chip-text-active: #ffffff;
+      --date-text: #666666;
+      --border-radius-lg: 18px;
+      --shadow-soft: 0 14px 30px rgba(0, 0, 0, 0.06);
+    }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
       margin: 0;
-      padding: 1.5rem;
-      background: #fff;
+      padding: 0;
+      background: var(--bg);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        sans-serif;
+      -webkit-font-smoothing: antialiased;
     }
 
     .forced-labor-app {
       max-width: 960px;
       margin: 0 auto;
+      padding: 1.25rem 1.5rem 2.5rem;
     }
 
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 0.25rem;
+    .forced-labor-app h1 {
+      font-size: 2.05rem;      /* slightly smaller */
+      margin: 0 0 0.35rem;
+      font-weight: 700;
     }
 
     .current-date {
       font-size: 0.95rem;
-      color: #555;
-      margin-bottom: 1rem;
+      color: var(--date-text);
+      margin-bottom: 0.75rem;
     }
 
-    /* Filter buttons layout */
+    /* Filter chips */
     .filter-buttons {
       display: flex;
-      flex-wrap: wrap;
       gap: 0.5rem;
-      margin-bottom: 1.2rem;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding: 0.25rem 0 0.7rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .filter-buttons::-webkit-scrollbar {
+      display: none;
     }
 
     .filter-btn {
-      border: 1px solid #ddd;
-      padding: 0.45rem 0.9rem;
+      border: none;
+      padding: 0.35rem 0.9rem;  /* slightly tighter */
       border-radius: 999px;
-      background: #f5f5f5;
+      background: var(--chip-bg);
+      color: var(--chip-text);
       cursor: pointer;
-      font-size: 0.92rem;
+      font-size: 0.9rem;
+      white-space: nowrap;
     }
 
     .filter-btn.active {
-      background: #000;
-      color: #fff;
-      border-color: #000;
+      background: var(--chip-active-bg);
+      color: var(--chip-text-active);
     }
 
-    /* Chore card stack (vertical) and left-aligned */
+    /* Stack cards vertically & left align under title */
     .chores-container {
       display: flex;
       flex-direction: column;
-      gap: 0.9rem;
-      width: min(640px, 100%);
+      gap: 0.7rem;
+      max-width: 640px;
       margin-left: 0;
       margin-right: auto;
     }
 
     .chore-card {
-      border-radius: 0.85rem;
-      padding: 1.1rem;
-      background: #fafafa;
-      border-left: 6px solid #ccc;
-      box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.06);
-      font-size: 0.97rem;
+      border-radius: var(--border-radius-lg);
+      padding: 0.9rem 1.1rem;  /* slightly tighter to help fit */
+      background: var(--card-bg);
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .chore-card::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 5px;
+      border-radius: var(--border-radius-lg) 0 0 var(--border-radius-lg);
+      background: linear-gradient(180deg, #34c759, #0fb163);
+    }
+
+    .chore-card.turner::before {
+      background: linear-gradient(180deg, #0a84ff, #0070f3);
+    }
+
+    .chore-card.miles::before {
+      background: linear-gradient(180deg, #30d1c6, #0fb4a9);
+    }
+
+    .chore-card.stewart::before {
+      background: linear-gradient(180deg, #af52de, #8e44ad);
+    }
+
+    .chore-content {
+      margin-left: 0.7rem;
     }
 
     .chore-kid {
-      font-weight: 600;
-      margin-bottom: 0.35rem;
+      font-weight: 650;
+      font-size: 1.02rem;
+      margin-bottom: 0.2rem;
     }
 
     .chore-daily,
     .chore-weekly {
-      margin: 0.2rem 0;
+      font-size: 0.97rem;
+    }
+
+    .label {
+      font-weight: 700;
     }
 
     .chore-date {
-      margin-top: 0.6rem;
-      font-size: 0.9rem;
-      color: #777;
+      margin-top: 0.1rem;
+      font-size: 0.82rem;
+      color: var(--date-text);
     }
 
-    /* Kid-specific accent colors */
-    .Emmitt { border-left-color: #2ecc71; }
-    .Turner { border-left-color: #3498db; }
-    .Miles  { border-left-color: #1abc9c; }
-    .Stewart { border-left-color: #9b59b6; }
-  </style>
-</head>
+    .empty-state,
+    .error-state {
+      font-size: 0.9rem;
+      color: #cc3300;
+      margin-top: 1.5rem;
+    }
 
-<body>
-<div class="forced-labor-app">
-  <h1>Forced Labor</h1>
-  <p id="chore-date" class="current-date"></p>
+    /* Mobile tweaks – just a bit smaller so everything fits */
+    @media (max-width: 600px) {
+      .forced-labor-app {
+        padding: 1.1rem 1.2rem 2.1rem;
+      }
 
-  <div class="filter-buttons">
-    <button class="filter-btn active" data-kid="all">All</button>
-    <button class="filter-btn" data-kid="Emmitt">Emmitt</button>
-    <button class="filter-btn" data-kid="Turner">Turner</button>
-    <button class="filter-btn" data-kid="Miles">Miles</button>
-    <button class="filter-btn" data-kid="Stewart">Stewart</button>
-  </div>
+      .forced-labor-app h1 {
+        font-size: 1.9rem;
+      }
 
-  <div id="chores-container" class="chores-container">
-    <p class="loading">Loading chores from Google Sheets…</p>
-  </div>
-</div>
+      .current-date {
+        font-size: 0.9rem;
+      }
 
-<script>
-  const sheetId = "1qQEGcKsi5SW6xiZZXkZbV5rY8x7Hs1ImXt8lIXN_uzE";
-  const sheetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+      .filter-btn {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.86rem;
+      }
 
-  const choreDate = document.getElementById("chore-date");
-  const choresContainer = document.getElementById("chores-container");
-  const filterButtons = document.querySelectorAll(".filter-btn");
+      .chore-card {
+        padding: 0.8rem 1rem;
+      }
 
-  // Show today's date under the title
-  function updateDate() {
-    const now = new Date();
-    choreDate.textContent = now.toLocaleDateString("en-US", {
-      weekday: "long",
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  }
-  updateDate();
+      .chore-kid {
+        font-size: 1rem;
+      }
 
-  // Format whatever crazy thing Sheets gives us into mm/dd/yyyy
-  function formatDisplayDate(raw) {
-    if (!raw) return "";
+      .chore-daily,
+      .chore-weekly {
+        font-size: 0.94rem;
+      }
 
-    // If it's like "Date(2025,11,2)"
-    if (typeof raw === "string" && raw.startsWith("Date(")) {
-      const parts = raw.match(/\d+/g);
-      if (parts && parts.length >= 3) {
-        const y = Number(parts[0]);
-        const m = Number(parts[1]); // already zero-based in that string
-        const d = Number(parts[2]);
-        const js = new Date(y, m, d);
-        return js.toLocaleDateString("en-US");
+      .chore-date {
+        font-size: 0.78rem;
       }
     }
+  </style>
+</head>
+<body>
+  <div class="forced-labor-app">
+    <h1>Forced Labor</h1>
+    <p id="chore-date" class="current-date"></p>
 
-    // If it's a Sheets serial number
-    if (typeof raw === "number") {
-      const ms = (raw - 25569) * 86400 * 1000;
-      const js = new Date(ms);
-      return js.toLocaleDateString("en-US");
-    }
+    <div class="filter-buttons">
+      <button class="filter-btn active" data-kid="all">All</button>
+      <button class="filter-btn" data-kid="Emmitt">Emmitt</button>
+      <button class="filter-btn" data-kid="Turner">Turner</button>
+      <button class="filter-btn" data-kid="Miles">Miles</button>
+      <button class="filter-btn" data-kid="Stewart">Stewart</button>
+    </div>
 
-    // Already human-readable
-    return String(raw);
-  }
+    <div id="chores-container" class="chores-container">
+      <p class="empty-state">Loading chores from Google Sheets...</p>
+    </div>
+  </div>
 
-  // Parse the Google Sheets JSON
-  function parseSheetResponse(text) {
-    const jsonText = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
-    const obj = JSON.parse(jsonText);
-    const rows = obj.table.rows || [];
+  <script>
+    (function () {
+      const SHEET_ID =
+        "1qQEGcKsi5SW6xiZZXkZbV5rY8x7Hs1ImXt8lIXN_uzE";
+      const SHEET_GID = 0;
 
-    return rows.map(r => {
-      const c = r.c || [];
-      const dateCell = c[0];
+      const sheetUrl =
+        "https://docs.google.com/spreadsheets/d/" +
+        SHEET_ID +
+        "/gviz/tq?gid=" +
+        SHEET_GID +
+        "&tqx=out:json";
 
-      let rawDate = "";
-      if (dateCell) {
-        if (dateCell.f) {
-          rawDate = dateCell.f;       // formatted string from Sheets
-        } else {
-          rawDate = dateCell.v;       // raw value
+      const choresContainer = document.getElementById("chores-container");
+      const dateEl = document.getElementById("chore-date");
+      const filterButtons = document.querySelectorAll(".filter-btn");
+
+      let allRows = [];
+      let todaysChores = [];
+
+      function formatHeaderDate() {
+        const now = new Date();
+        const opts = { weekday: "long", month: "short", day: "numeric", year: "numeric" };
+        const formatted = now.toLocaleDateString("en-US", opts);
+        dateEl.textContent = formatted;
+      }
+
+      function formatChoreDate(raw) {
+        if (!raw) return "";
+
+        // Handles Google "Date(2025,11,2)" format
+        if (typeof raw === "string" && raw.includes("Date(")) {
+          const m = raw.match(/Date\((\d+),(\d+),(\d+)/);
+          if (m) {
+            const y = parseInt(m[1], 10);
+            const month = parseInt(m[2], 10);
+            const d = parseInt(m[3], 10);
+            const jsDate = new Date(y, month, d);
+            return jsDate.toLocaleDateString("en-US");
+          }
+        }
+
+        // If it's already a JS Date
+        if (raw instanceof Date) {
+          return raw.toLocaleDateString("en-US");
+        }
+
+        // Fallback: treat as plain text
+        return String(raw);
+      }
+
+      function parseSheetResponse(text) {
+        const jsonText = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
+        const obj = JSON.parse(jsonText);
+        const rows = obj.table.rows || [];
+
+        return rows.map((r) => {
+          const c = r.c || [];
+          return {
+            date: formatChoreDate(c[0]?.v ?? ""),
+            kid: (c[1]?.v ?? "").toString().trim(),
+            dailyChore: (c[2]?.v ?? "").toString().trim(),
+            weeklyChore: (c[3]?.v ?? "").toString().trim(),
+            phone: (c[4]?.v ?? "").toString().trim(),
+            todayFlag: (c[5]?.v ?? "").toString().trim(),
+          };
+        });
+      }
+
+      function renderChores(filterKid) {
+        const rows =
+          filterKid === "all"
+            ? todaysChores
+            : todaysChores.filter((r) => r.kid.toLowerCase() === filterKid.toLowerCase());
+
+        if (!rows.length) {
+          choresContainer.innerHTML =
+            '<p class="empty-state">No rows are marked "Yes" in the Today column. Check the Google Sheet.</p>';
+          return;
+        }
+
+        choresContainer.innerHTML = "";
+
+        rows.forEach((row) => {
+          const card = document.createElement("div");
+          const kidClass = row.kid.toLowerCase();
+          card.className = `chore-card ${kidClass}`;
+
+          card.innerHTML = `
+            <div class="chore-content">
+              <div class="chore-kid">${row.kid}</div>
+              <div class="chore-daily">
+                <span class="label">Daily:</span> ${row.dailyChore || "—"}
+              </div>
+              <div class="chore-weekly">
+                <span class="label">Weekly:</span> ${row.weeklyChore || "—"}
+              </div>
+              <div class="chore-date">${row.date}</div>
+            </div>
+          `;
+
+          choresContainer.appendChild(card);
+        });
+      }
+
+      async function loadChores() {
+        try {
+          choresContainer.innerHTML =
+            '<p class="empty-state">Loading chores from the spreadsheet...</p>';
+
+          const res = await fetch(sheetUrl);
+          const text = await res.text();
+
+          allRows = parseSheetResponse(text);
+
+          // Only rows where Today column is "Yes"
+          todaysChores = allRows.filter(
+            (row) => row.todayFlag.toLowerCase() === "yes"
+          );
+
+          renderChores("all");
+        } catch (err) {
+          console.error("Error loading sheet:", err);
+          choresContainer.innerHTML =
+            '<p class="error-state">Could not load chores from Google Sheets. Tell Dad to fix it.</p>';
         }
       }
 
-      return {
-        date: formatDisplayDate(rawDate),
-        kid: (c[1]?.v || "").trim(),
-        dailyChore: c[2]?.v || "",
-        weeklyChore: c[3]?.v || "",
-        phone: c[4]?.v || "",
-        todayFlag: ((c[5]?.v || "") + "").trim()
-      };
-    });
-  }
-
-  let visibleRows = [];
-
-  function renderChores(kidFilter) {
-    choresContainer.innerHTML = "";
-
-    const rowsToShow =
-      kidFilter === "all"
-        ? visibleRows
-        : visibleRows.filter(row => row.kid === kidFilter);
-
-    if (!rowsToShow.length) {
-      choresContainer.innerHTML =
-        `<p>No rows are marked "Yes" in the Today column. Check the Google Sheet.</p>`;
-      return;
-    }
-
-    rowsToShow.forEach(row => {
-      const card = document.createElement("div");
-      card.className = `chore-card ${row.kid}`;
-
-      card.innerHTML = `
-        <div class="chore-kid">${row.kid}</div>
-        <div class="chore-daily"><strong>Daily:</strong> ${row.dailyChore}</div>
-        <div class="chore-weekly"><strong>Weekly:</strong> ${row.weeklyChore}</div>
-        <div class="chore-date">${row.date}</div>
-      `;
-
-      choresContainer.appendChild(card);
-    });
-  }
-
-  function attachFilters() {
-    filterButtons.forEach(btn => {
-      btn.addEventListener("click", () => {
-        document.querySelector(".filter-btn.active").classList.remove("active");
-        btn.classList.add("active");
-        const kid = btn.dataset.kid;
-        renderChores(kid);
-      });
-    });
-  }
-
-  async function loadChores() {
-    try {
-      const res = await fetch(sheetUrl);
-      const text = await res.text();
-      const allRows = parseSheetResponse(text);
-
-      // Only rows where Today column == "Yes"
-      visibleRows = allRows.filter(
-        row => row.todayFlag.toLowerCase() === "yes"
-      );
-
-      if (!visibleRows.length) {
-        choresContainer.innerHTML =
-          `<p>No rows are marked "Yes" in the Today column. Check the Google Sheet.</p>`;
-        return;
+      function attachFilters() {
+        filterButtons.forEach((btn) => {
+          btn.addEventListener("click", () => {
+            filterButtons.forEach((b) => b.classList.remove("active"));
+            btn.classList.add("active");
+            const kid = btn.getAttribute("data-kid");
+            renderChores(kid);
+          });
+        });
       }
 
-      renderChores("all");
-    } catch (err) {
-      console.error("Error loading sheet", err);
-      choresContainer.innerHTML =
-        `<p style="color:red;">Could not load chores from Google Sheets. Tell Dad to fix it.</p>`;
-    }
-  }
-
-  attachFilters();
-  loadChores();
-</script>
-
+      formatHeaderDate();
+      attachFilters();
+      loadChores();
+    })();
+  </script>
 </body>
 </html>
