@@ -2,16 +2,106 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
-  <!-- PWA manifest & icons -->
-  <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" sizes="180x180" href="icons/forced_labor_icon_180.png">
-<link rel="apple-touch-icon" sizes="192x192" href="icons/forced_labor_icon_192.png">
-<link rel="apple-touch-icon" sizes="512x512" href="icons/forced_labor_icon_512.png">
-
+  <!-- Title -->
   <title>Forced Labor</title>
+
+  <!-- PWA manifest & Apple Touch Icon -->
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/forced-labor-icon-192.png" />
+
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+      margin: 0;
+      padding: 1.5rem;
+      background: #fff;
+    }
+
+    .forced-labor-app {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .current-date {
+      font-size: 0.95rem;
+      color: #555;
+      margin-bottom: 1rem;
+    }
+
+    /* Filter buttons layout */
+    .filter-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .filter-btn {
+      border: 1px solid #ddd;
+      padding: 0.45rem 0.9rem;
+      border-radius: 999px;
+      background: #f5f5f5;
+      cursor: pointer;
+      font-size: 0.92rem;
+    }
+
+    .filter-btn.active {
+      background: #000;
+      color: #fff;
+      border-color: #000;
+    }
+
+    /* Chore card stack (vertical) and left-aligned */
+    .chores-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      width: min(640px, 100%);
+      margin-left: 0;
+      margin-right: auto;
+    }
+
+    .chore-card {
+      border-radius: 0.85rem;
+      padding: 1.1rem;
+      background: #fafafa;
+      border-left: 6px solid #ccc;
+      box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.06);
+      font-size: 0.97rem;
+    }
+
+    .chore-kid {
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+
+    .chore-daily,
+    .chore-weekly {
+      margin: 0.2rem 0;
+    }
+
+    .chore-date {
+      margin-top: 0.6rem;
+      font-size: 0.9rem;
+      color: #777;
+    }
+
+    /* Kid-specific accent colors */
+    .Emmitt { border-left-color: #2ecc71; }
+    .Turner { border-left-color: #3498db; }
+    .Miles  { border-left-color: #1abc9c; }
+    .Stewart { border-left-color: #9b59b6; }
+
+  </style>
 </head>
+
 <body>
 <div class="forced-labor-app">
   <h1>Forced Labor</h1>
@@ -30,295 +120,99 @@
   </div>
 </div>
 
-<style>
-  .forced-labor-app {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 1.5rem 1.75rem 2rem;
-  }
-
-  .forced-labor-app h1 {
-    font-size: 2rem;
-    margin-bottom: 0.25rem;
-  }
-
-  .current-date {
-    font-size: 0.95rem;
-    color: #555;
-    margin-bottom: 1rem;
-  }
-
-  .filter-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1.1rem;
-}
-
-@media (max-width: 600px) {
-
-  /* Filter button row spacing – tighter so all 5 fit */
-  .filter-buttons {
-    gap: 0.25rem;        /* smaller gaps between pills */
-    margin-bottom: 0.8rem;
-    flex-wrap: wrap;     /* still allowed to wrap, but should usually fit */
-  }
-
-  /* Filter pill styling – smaller text & padding */
-  .filter-btn {
-    padding: 0.25rem 0.7rem;  /* tighter all around */
-    font-size: 0.85rem;       /* a bit smaller */
-    border-radius: 1rem;
-  }
-
-}
-}
-
-  .filter-btn {
-    border: 1px solid #ddd;
-    padding: 0.4rem 0.85rem;
-    border-radius: 999px;
-    background: #f5f5f5;
-    cursor: pointer;
-    font-size: 0.9rem;
-  }
-
-  .filter-btn.active {
-    background: #222;
-    color: #fff;
-    border-color: #222;
-  }
-
-  /* STACK CARDS VERTICALLY & LEFT ALIGN UNDER TITLE */
-  .chores-container {
-    display: flex;
-    flex-direction: column;
-    gap: 0.8rem;
-    width: min(640px, 100%);
-    margin-left: 0;       /* left align */
-    margin-right: auto;   /* keep whitespace on the right */
-  }
-
-  .chore-card {
-    border-radius: 0.85rem;
-    padding: 1rem 1.1rem;
-    background: #fafafa;
-    border-left: 5px solid #ccc;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-    font-size: 0.95rem;
-  }
-
-  .chore-kid {
-    font-weight: 600;
-    margin-bottom: 0.35rem;
-  }
-
-  .chore-daily,
-  .chore-weekly {
-    font-size: 0.95rem;
-    margin: 0.15rem 0;
-    line-height: 1.35;
-  }
-
-  .chore-label {
-    font-weight: 600;
-  }
-
-  .chore-date {
-    font-size: 0.8rem;
-    color: #777;
-    margin-top: 0.4rem;
-  }
-
-  .loading,
-  .empty-state,
-  .error-state {
-    font-size: 0.95rem;
-    color: #666;
-  }
-
-  .error-state {
-    color: #b00020;
-  }
-
-  /* Color accents by kid */
-  .kid-Emmitt {
-    border-left-color: #22c55e; /* green */
-  }
-  .kid-Turner {
-    border-left-color: #3b82f6; /* blue */
-  }
-  .kid-Miles {
-    border-left-color: #14b8a6; /* teal */
-  }
-  .kid-Stewart {
-    border-left-color: #a855f7; /* purple */
-  }
-
-  /* 📱 Mobile: make it feel like an app */
-  @media (max-width: 600px) {
-
-  .forced-labor-app {
-    max-width: 100%;
-    padding: 1.25rem 1.25rem 1.75rem;
-  }
-
-  .forced-labor-app h1 {
-    font-size: 1.9rem;
-    margin-bottom: 0.3rem;
-  }
-
-  .current-date {
-    font-size: 1.05rem;
-    margin-bottom: 1rem;
-  }
-
-  .chore-card {
-    font-size: 1rem;
-    padding: 0.9rem 1rem;
-    margin-bottom: 0.75rem;
-  }
-
-  .chore-card h3 {
-    font-size: 1.15rem;
-  }
-
-  .chore-card p {
-    font-size: 0.95rem;
-    line-height: 1.4;
-  }
-}
-</style>
-
 <script>
-  (function () {
-    // KEEP YOUR REAL SHEET ID HERE
-    const SHEET_ID = "1qQEGcKsi5SW6xiZZXkZbV5rY8x7Hs1ImXt8lIXN_uzE";
-    const SHEET_NAME = "Chores";
+  const sheetId = "1qQEGcKsi5SW6xiZZXkZbV5rY8x7Hs1ImXt8lIXN_uzE";
+  const sheetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
 
-    const choresContainer = document.getElementById("chores-container");
-    const filterButtons = document.querySelectorAll(".filter-btn");
-    const dateEl = document.getElementById("chore-date");
-    let todaysChores = [];
+  const choreDate = document.getElementById("chore-date");
+  const choresContainer = document.getElementById("chores-container");
+  const filterButtons = document.querySelectorAll(".filter-btn");
 
-    // Set today's date under the title
+  function updateDate() {
     const now = new Date();
-    const dateOptions = {
+    choreDate.textContent = now.toLocaleDateString("en-US", {
       weekday: "long",
       month: "short",
       day: "numeric",
-      year: "numeric"
-    };
-    dateEl.textContent = now.toLocaleDateString(undefined, dateOptions);
+      year: "numeric",
+    });
+  }
+  updateDate();
 
-    const sheetUrl =
-      "https://docs.google.com/spreadsheets/d/" +
-      SHEET_ID +
-      "/gviz/tq?sheet=" +
-      encodeURIComponent(SHEET_NAME);
+  function parseSheetResponse(text) {
+    const jsonText = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
+    const obj = JSON.parse(jsonText);
+    const rows = obj.table.rows || [];
 
-    function setLoading(message) {
-      choresContainer.innerHTML = '<p class="loading">' + message + "</p>";
+    return rows.map(r => {
+      const c = r.c || [];
+      return {
+        date: c[0]?.v || "",
+        kid: (c[1]?.v || "").trim(),
+        daily: c[2]?.v || "",
+        weekly: c[3]?.v || "",
+      };
+    });
+  }
+
+  let allRows = [];
+
+  function renderChores(kidFilter) {
+    choresContainer.innerHTML = "";
+
+    const filtered = kidFilter === "all"
+      ? allRows
+      : allRows.filter(row => row.kid === kidFilter);
+
+    if (!filtered.length) {
+      choresContainer.innerHTML = `<p>No chores found.</p>`;
+      return;
     }
 
-    function setError(message) {
-      choresContainer.innerHTML = '<p class="error-state">' + message + "</p>";
-    }
+    filtered.forEach(row => {
+      const card = document.createElement("div");
+      card.className = `chore-card ${row.kid}`;
 
-    function renderChores(filterKid) {
-      const kidFilter = filterKid || "all";
-      let data = todaysChores;
+      card.innerHTML = `
+        <div class="chore-kid">${row.kid}</div>
+        <div class="chore-daily"><strong>Daily:</strong> ${row.daily}</div>
+        <div class="chore-weekly"><strong>Weekly:</strong> ${row.weekly}</div>
+        <div class="chore-date">${row.date}</div>
+      `;
 
-      if (kidFilter !== "all") {
-        data = data.filter(row => row.kid === kidFilter);
-      }
+      choresContainer.appendChild(card);
+    });
+  }
 
-      if (!data.length) {
-        choresContainer.innerHTML =
-          '<p class="empty-state">No chores found for this selection. Either Dad messed up the sheet or it\'s a free day.</p>';
-        return;
-      }
+  function attachFilters() {
+    filterButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelector(".filter-btn.active").classList.remove("active");
+        btn.classList.add("active");
 
-      const cardsHtml = data
-        .map(row => {
-          const kidClass = "kid-" + row.kid.replace(/\s+/g, "");
-          return `
-            <div class="chore-card ${kidClass}">
-              <div class="chore-kid">${row.kid}</div>
-              <div class="chore-daily">
-                <span class="chore-label">Daily:</span> ${row.dailyChore || "—"}
-              </div>
-              <div class="chore-weekly">
-                <span class="chore-label">Weekly:</span> ${row.weeklyChore || "—"}
-              </div>
-              <div class="chore-date">${row.date}</div>
-            </div>
-          `;
-        })
-        .join("");
-
-      choresContainer.innerHTML = cardsHtml;
-    }
-
-    function attachFilters() {
-      filterButtons.forEach(btn => {
-        btn.addEventListener("click", () => {
-          filterButtons.forEach(b => b.classList.remove("active"));
-          btn.classList.add("active");
-          const kid = btn.getAttribute("data-kid");
-          renderChores(kid);
-        });
+        const kid = btn.dataset.kid;
+        renderChores(kid);
       });
+    });
+  }
+
+  async function loadChores() {
+    try {
+      const res = await fetch(sheetUrl);
+      const text = await res.text();
+      allRows = parseSheetResponse(text);
+
+      renderChores("all");
+    } catch (err) {
+      console.error(err);
+      choresContainer.innerHTML = `<p style="color:red;">Could not load chores from Google Sheets. Tell Dad to fix it.</p>`;
     }
+  }
 
-    function parseSheetResponse(text) {
-      const jsonText = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
-      const obj = JSON.parse(jsonText);
+  attachFilters();
+  loadChores();
 
-      const rows = obj.table.rows || [];
-      return rows.map(r => {
-        const c = r.c || [];
-        return {
-          date: c[0]?.f || c[0]?.v || "",
-          kid: c[1]?.v || "",
-          dailyChore: c[2]?.v || "",
-          weeklyChore: c[3]?.v || "",
-          phone: c[4]?.v || "",
-          todayFlag: (c[5]?.v || "").toString().trim()
-        };
-      });
-    }
-
-    async function loadChores() {
-      try {
-        setLoading("Loading chores from the spreadsheet…");
-        const res = await fetch(sheetUrl);
-        const text = await res.text();
-
-        const allRows = parseSheetResponse(text);
-
-        // Only rows where Today column = "Yes"
-        todaysChores = allRows.filter(
-          row => row.todayFlag.toLowerCase() === "yes"
-        );
-
-        if (!todaysChores.length) {
-          choresContainer.innerHTML =
-            '<p class="empty-state">No rows are marked "Yes" in the Today column. Check the Google Sheet.</p>';
-          return;
-        }
-
-        renderChores("all");
-      } catch (err) {
-        console.error("Error loading sheet", err);
-        setError("Could not load chores from Google Sheets. Tell Dad to fix it.");
-      }
-    }
-
-    attachFilters();
-    loadChores();
-  })();
 </script>
+
 </body>
 </html>
