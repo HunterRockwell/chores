@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SMS Consent - Chores</title>
+  <style>
+    body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;max-width:820px;margin:0 auto;padding:24px;line-height:1.45}
+    h1{margin:0 0 10px}
+    .box{background:#f7f7f7;border:1px solid #e5e5e5;border-radius:12px;padding:16px}
+    code{background:#eee;padding:2px 6px;border-radius:6px}
+  </style>
+</head>
+<body>
+  <h1>SMS Consent (Opt-In) – Chores Reminders</h1>
+
+  <div class="box">
+    <p><strong>Program:</strong> Household Chores Reminder Texts</p>
+    <p><strong>Sender:</strong> Jason Pratt (household administrator)</p>
+    <p><strong>Purpose:</strong> Daily SMS reminders about assigned household chores (daily + weekly tasks).</p>
+    <p><strong>Message frequency:</strong> Up to 1 message per day (typically at 6:00 AM local time).</p>
+    <p><strong>Opt-in:</strong> Recipients opt in directly with Jason Pratt (household administrator).</p>
+    <p><strong>Opt-out:</strong> Reply <strong>STOP</strong> to cancel messages.</p>
+    <p><strong>Help:</strong> Reply <strong>HELP</strong> for help.</p>
+    <p><strong>Rates:</strong> Message & data rates may apply.</p>
+    <p><strong>Consent:</strong> Consent to receive SMS is not a condition of any purchase.</p>
+    <p><strong>Privacy:</strong> See <a href="./privacy.html">Privacy Policy</a></p>
+    <p><strong>Terms:</strong> See <a href="./terms.html">Terms &amp; Conditions</a></p>
+  </div>
+
+  <p style="margin-top:18px;color:#666">
+    Last updated: <span id="d"></span>
+  </p>
+  <script>
+    document.getElementById("d").textContent = new Date().toISOString().slice(0,10);
+  </script>
+</body>
+</html>
