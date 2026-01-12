@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Chore Reminders SMS Opt-In</title>
+  <style>
+    :root{
+      --bg:#f5f5f7;
+      --card:#ffffff;
+      --text:#111111;
+      --muted:#666666;
+      --border:#e6e6e6;
+      --accent:#007aff;
+      --shadow:0 14px 30px rgba(0,0,0,0.06);
+      --radius:18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+    body{
+      margin:0;
+      background:var(--bg);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+      color:var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap{
+      max-width:760px;
+      margin:0 auto;
+      padding: 1.25rem 1.25rem 2.5rem;
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:1.25rem 1.25rem 1.1rem;
+    }
+    h1{
+      font-size:1.6rem;
+      margin:0 0 .25rem;
+      font-weight:750;
+    }
+    .sub{
+      margin:0 0 1rem;
+      color:var(--muted);
+      font-size:.98rem;
+      line-height:1.35;
+    }
+    .kvs{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:.55rem;
+      margin: 1rem 0 1.1rem;
+    }
+    .kv{
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:.8rem .9rem;
+      background:#fff;
+    }
+    .kv b{
+      display:block;
+      font-size:.9rem;
+      margin-bottom:.2rem;
+    }
+    .kv span{
+      display:block;
+      color:var(--muted);
+      line-height:1.35;
+      font-size:.93rem;
+    }
+    .mono{
+      font-family:var(--mono);
+      letter-spacing:.2px;
+      color:#000;
+      font-weight:650;
+    }
+    .section-title{
+      margin:1.1rem 0 .4rem;
+      font-weight:750;
+    }
+    ul{
+      margin:.3rem 0 0 1.1rem;
+      color:var(--muted);
+      line-height:1.5;
+      font-size:.95rem;
+    }
+    .form{
+      margin-top:1.1rem;
+      border-top:1px solid var(--border);
+      padding-top:1rem;
+    }
+    label{
+      display:block;
+      font-size:.95rem;
+      margin:.75rem 0 .35rem;
+      font-weight:650;
+    }
+    input[type="text"], input[type="tel"]{
+      width:100%;
+      box-sizing:border-box;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:.75rem .85rem;
+      font-size:1rem;
+      outline:none;
+      background:#fff;
+    }
+    input[type="text"]:focus, input[type="tel"]:focus{
+      border-color: rgba(0,122,255,.55);
+      box-shadow: 0 0 0 4px rgba(0,122,255,.12);
+    }
+    .checkline{
+      display:flex;
+      gap:.6rem;
+      align-items:flex-start;
+      margin: .85rem 0 1rem;
+      color:var(--muted);
+      line-height:1.45;
+      font-size:.93rem;
+    }
+    .checkline input{
+      margin-top:.22rem;
+      transform: scale(1.05);
+    }
+    .btnrow{
+      display:flex;
+      gap:.6rem;
+      flex-wrap:wrap;
+      align-items:center;
+      margin-top:.2rem;
+    }
+    button{
+      border:none;
+      border-radius:14px;
+      padding:.8rem 1rem;
+      font-size:1rem;
+      font-weight:700;
+      cursor:pointer;
+      background:var(--accent);
+      color:#fff;
+    }
+    button:disabled{
+      background:#b6b6b6;
+      cursor:not-allowed;
+    }
+    .note{
+      font-size:.9rem;
+      color:var(--muted);
+      margin:.7rem 0 0;
+      line-height:1.4;
+    }
+    .result{
+      margin-top:1rem;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:.9rem;
+      background:#fff;
+      display:none;
+    }
+    .result b{ display:block; margin-bottom:.35rem; }
+    .result .mono{ font-weight:750; }
+    .small{
+      font-size:.85rem;
+      color:var(--muted);
+      margin-top:.45rem;
+      line-height:1.35;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>SMS Opt-In: Household Chore Reminders</h1>
+      <p class="sub">
+        This page is used to collect consent to receive daily household chore reminder text messages.
+        You will not receive messages unless you opt in.
+      </p>
+
+      <div class="kvs">
+        <div class="kv">
+          <b>Sender (Toll-Free Number)</b>
+          <span class="mono">+1 (844) 484-7701</span>
+        </div>
+        <div class="kv">
+          <b>Message Type</b>
+          <span>Transactional household reminders (daily chores and weekly responsibilities).</span>
+        </div>
+        <div class="kv">
+          <b>Frequency</b>
+          <span>Up to 1 message per day.</span>
+        </div>
+        <div class="kv">
+          <b>Opt-out</b>
+          <span>Reply <span class="mono">STOP</span> to cancel at any time. Reply <span class="mono">HELP</span> for help.</span>
+        </div>
+        <div class="kv">
+          <b>Privacy & Terms</b>
+          <span>
+            Privacy Policy: <span class="mono">/chores/privacy.html</span><br/>
+            Terms: <span class="mono">/chores/terms.html</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="section-title">Example message</div>
+      <ul>
+        <li><span class="mono">Good morning Emmitt</span> — today’s chore: Dogs & Back Porch. This week’s chore: Bathrooms. Reply STOP to opt out. — Dad</li>
+      </ul>
+
+      <div class="form" aria-label="Opt-in form">
+        <div class="section-title">Opt in here</div>
+
+        <label for="name">Your name</label>
+        <input id="name" type="text" placeholder="First name (or full name)" autocomplete="name" />
+
+        <label for="phone">Mobile number</label>
+        <input id="phone" type="tel" placeholder="(###) ###-####" autocomplete="tel" />
+
+        <div class="checkline">
+          <input id="agree" type="checkbox" />
+          <div>
+            I agree to receive SMS text messages from <span class="mono">+1 (844) 484-7701</span> for daily household chore reminders.
+            Message frequency: up to 1 message/day. Reply <span class="mono">STOP</span> to cancel, <span class="mono">HELP</span> for help.
+            Message and data rates may apply.
+          </div>
+        </div>
+
+        <div class="btnrow">
+          <button id="btn" disabled>Generate my opt-in record</button>
+        </div>
+
+        <p class="note">
+          This page is designed to document consent for compliance purposes.
+          Submitting this form does not automatically enroll you in messages; it creates a consent record you can show to Twilio.
+        </p>
+
+        <div id="result" class="result">
+          <b>Opt-in record created</b>
+          <div>Timestamp: <span id="ts" class="mono"></span></div>
+          <div>Name: <span id="rname" class="mono"></span></div>
+          <div>Phone: <span id="rphone" class="mono"></span></div>
+          <div class="small">
+            Keep a screenshot of this page as proof of consent. You can also print to PDF.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const nameEl = document.getElementById("name");
+      const phoneEl = document.getElementById("phone");
+      const agreeEl = document.getElementById("agree");
+      const btn = document.getElementById("btn");
+      const result = document.getElementById("result");
+      const ts = document.getElementById("ts");
+      const rname = document.getElementById("rname");
+      const rphone = document.getElementById("rphone");
+
+      function normalizePhone(v){
+        const digits = (v || "").replace(/\D/g, "");
+        if (digits.length === 10) return `+1${digits}`;
+        if (digits.length === 11 && digits.startsWith("1")) return `+${digits}`;
+        return "";
+      }
+
+      function updateBtn(){
+        const n = (nameEl.value || "").trim();
+        const p = normalizePhone(phoneEl.value);
+        const ok = n.length >= 2 && p.length >= 12 && agreeEl.checked;
+        btn.disabled = !ok;
+      }
+
+      nameEl.addEventListener("input", updateBtn);
+      phoneEl.addEventListener("input", updateBtn);
+      agreeEl.addEventListener("change", updateBtn);
+
+      btn.addEventListener("click", function(){
+        const n = (nameEl.value || "").trim();
+        const p = normalizePhone(phoneEl.value);
+        const now = new Date();
+        ts.textContent = now.toISOString();
+        rname.textContent = n;
+        rphone.textContent = p;
+        result.style.display = "block";
+        result.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    })();
+  </script>
+</body>
+</html>
