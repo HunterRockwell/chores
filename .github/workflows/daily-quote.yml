@@ -1,0 +1,37 @@
+name: Daily Quote Generator
+
+on:
+  schedule:
+    - cron: "55 13 * * *" # ~5:55 AM Pacific (DST varies)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install deps
+        run: npm init -y && npm install openai
+
+      - name: Generate daily message
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: node .github/scripts/generate-daily-quote.mjs
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add daily/*.json
+          git commit -m "Add daily quote" || echo "No changes to commit"
+          git push
