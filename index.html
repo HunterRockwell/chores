@@ -50,7 +50,7 @@
     }
 
     .forced-labor-app h1 {
-      font-size: 2.05rem;      /* slightly smaller */
+      font-size: 2.05rem;
       margin: 0 0 0.35rem;
       font-weight: 700;
     }
@@ -77,7 +77,7 @@
 
     .filter-btn {
       border: none;
-      padding: 0.35rem 0.9rem;  /* slightly tighter */
+      padding: 0.35rem 0.9rem;
       border-radius: 999px;
       background: var(--chip-bg);
       color: var(--chip-text);
@@ -91,7 +91,7 @@
       color: var(--chip-text-active);
     }
 
-    /* Previous day nav (directly below boys row) */
+    /* Day nav (directly below boys row) */
     .day-nav {
       margin: 0.2rem 0 0.9rem;
       text-align: left;
@@ -121,7 +121,7 @@
 
     .chore-card {
       border-radius: var(--border-radius-lg);
-      padding: 0.9rem 1.1rem;  /* slightly tighter to help fit */
+      padding: 0.9rem 1.1rem;
       background: var(--card-bg);
       box-shadow: var(--shadow-soft);
       position: relative;
@@ -185,7 +185,6 @@
       margin-top: 1.5rem;
     }
 
-    /* Mobile tweaks – just a bit smaller so everything fits */
     @media (max-width: 600px) {
       .forced-labor-app {
         padding: 1.1rem 1.2rem 2.1rem;
@@ -240,11 +239,13 @@
       <button class="filter-btn" data-kid="Stewart">Stewart</button>
     </div>
 
-    <!-- NEW: Previous Day link (directly below boys names row) -->
+    <!-- Day navigation -->
     <div class="day-nav">
-      <a id="prev-day-link" href="index.html?day=previous">← Previous Day</a>
+      <a id="prev-day-link" href="#">← Previous Day</a>
+      <span>&nbsp;|&nbsp;</span>
+      <a id="next-day-link" href="#">Next Day →</a>
       <span id="back-to-today-wrap" style="display:none;">&nbsp;|&nbsp;
-        <a href="index.html">Back to Today</a>
+        <a id="back-to-today-link" href="#">Back to Today</a>
       </span>
     </div>
 
@@ -269,13 +270,17 @@
       const choresContainer = document.getElementById("chores-container");
       const dateEl = document.getElementById("chore-date");
       const filterButtons = document.querySelectorAll(".filter-btn");
+
+      const prevDayLink = document.getElementById("prev-day-link");
+      const nextDayLink = document.getElementById("next-day-link");
       const backToTodayWrap = document.getElementById("back-to-today-wrap");
+      const backToTodayLink = document.getElementById("back-to-today-link");
 
       let allRows = [];
-      let visibleChores = []; // what we are currently showing (today or previous day)
+      let visibleChores = [];
 
       // ---------------------------
-      // Date helpers
+      // Date helpers (local-safe)
       // ---------------------------
       function normalizeDate(d) {
         const x = new Date(d);
@@ -283,16 +288,55 @@
         return x;
       }
 
-      function parseSelectedMode() {
-        const params = new URLSearchParams(window.location.search);
-        return (params.get("day") || "").toLowerCase(); // "", "previous"
+      function pad2(n) {
+        return String(n).padStart(2, "0");
       }
 
-      function getSelectedDate() {
-        const mode = parseSelectedMode();
-        const d = normalizeDate(new Date());
-        if (mode === "previous") d.setDate(d.getDate() - 1);
-        return d;
+      function toISODateLocal(d) {
+        const x = normalizeDate(d);
+        return `${x.getFullYear()}-${pad2(x.getMonth() + 1)}-${pad2(x.getDate())}`;
+      }
+
+      function fromISODateLocal(iso) {
+        const [y, m, day] = iso.split("-").map(Number);
+        return normalizeDate(new Date(y, m - 1, day));
+      }
+
+      function addDays(dateObj, days) {
+        const d = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+        d.setDate(d.getDate() + days);
+        return normalizeDate(d);
+      }
+
+      function getDateParam() {
+        const params = new URLSearchParams(window.location.search);
+        const iso = (params.get("date") || "").trim();
+        if (iso && /^\d{4}-\d{2}-\d{2}$/.test(iso)) return iso;
+        return "";
+      }
+
+      function setDateParam(iso) {
+        const params = new URLSearchParams(window.location.search);
+        params.set("date", iso);
+        const qs = params.toString();
+        window.location.href = `${window.location.pathname}?${qs}`;
+      }
+
+      function clearDateParam() {
+        const params = new URLSearchParams(window.location.search);
+        params.delete("date");
+        const qs = params.toString();
+        window.location.href = qs ? `${window.location.pathname}?${qs}` : window.location.pathname;
+      }
+
+      function isBrowsingHistory() {
+        return !!getDateParam();
+      }
+
+      function getViewDate() {
+        const iso = getDateParam();
+        if (iso) return fromISODateLocal(iso);
+        return normalizeDate(new Date());
       }
 
       function formatHeaderDate(selectedDate) {
@@ -310,7 +354,6 @@
       }
 
       function parseGvizDate(raw) {
-        // Google GViz often provides strings like "Date(2025,11,2)" where month is 0-based.
         if (!raw) return null;
 
         if (raw instanceof Date) {
@@ -321,13 +364,12 @@
           const m = raw.match(/Date\((\d+),(\d+),(\d+)\)/);
           if (m) {
             const y = parseInt(m[1], 10);
-            const month = parseInt(m[2], 10); // already 0-based
+            const month = parseInt(m[2], 10);
             const d = parseInt(m[3], 10);
             return normalizeDate(new Date(y, month, d));
           }
         }
 
-        // If it's a normal date string like "12/17/2025", try to parse
         const maybe = new Date(raw);
         if (!isNaN(maybe.getTime())) {
           return normalizeDate(maybe);
@@ -378,10 +420,10 @@
             : visibleChores.filter((r) => r.kid.toLowerCase() === filterKid.toLowerCase());
 
         if (!rows.length) {
-          const mode = parseSelectedMode();
-          if (mode === "previous") {
+          if (isBrowsingHistory()) {
+            const vd = getViewDate();
             choresContainer.innerHTML =
-              '<p class="empty-state">No chores found for the previous day. Check that yesterday’s date exists in the sheet.</p>';
+              `<p class="empty-state">No chores found for ${vd.toLocaleDateString("en-US")}. Check that date exists in the sheet.</p>`;
           } else {
             choresContainer.innerHTML =
               '<p class="empty-state">No rows are marked "Yes" in the Today column. Check the Google Sheet.</p>';
@@ -414,21 +456,17 @@
       }
 
       function setVisibleChores() {
-        const mode = parseSelectedMode();
-        const selectedDate = getSelectedDate();
+        const viewDate = getViewDate();
 
-        // Toggle "Back to Today" if we are in previous mode
-        backToTodayWrap.style.display = mode === "previous" ? "inline" : "none";
+        // Show Back to Today only if user is in date-browsing mode
+        backToTodayWrap.style.display = isBrowsingHistory() ? "inline" : "none";
 
-        if (mode === "previous") {
-          // Previous day mode: match by date column (yesterday)
-          visibleChores = allRows.filter((row) => row.dateObj && sameDay(row.dateObj, selectedDate));
+        if (isBrowsingHistory()) {
+          visibleChores = allRows.filter((row) => row.dateObj && sameDay(row.dateObj, viewDate));
         } else {
-          // Normal mode: original behavior, use Today = Yes
           visibleChores = allRows.filter((row) => row.todayFlag.toLowerCase() === "yes");
         }
 
-        // Keep currently selected filter button (active)
         const activeBtn = document.querySelector(".filter-btn.active");
         const activeKid = activeBtn ? activeBtn.getAttribute("data-kid") : "all";
 
@@ -463,11 +501,34 @@
         });
       }
 
+      function attachDayNav() {
+        prevDayLink.addEventListener("click", (e) => {
+          e.preventDefault();
+          const currentView = getViewDate(); // today if no ?date=
+          const target = addDays(currentView, -1);
+          setDateParam(toISODateLocal(target));
+        });
+
+        nextDayLink.addEventListener("click", (e) => {
+          e.preventDefault();
+          const currentView = getViewDate(); // today if no ?date=
+          const target = addDays(currentView, +1);
+          setDateParam(toISODateLocal(target));
+        });
+
+        backToTodayLink.addEventListener("click", (e) => {
+          e.preventDefault();
+          clearDateParam();
+        });
+      }
+
       // ---------------------------
       // Init
       // ---------------------------
-      const selectedDate = getSelectedDate();
-      formatHeaderDate(selectedDate);
+      const headerDate = getViewDate();
+      formatHeaderDate(headerDate);
+
+      attachDayNav();
       attachFilters();
       loadChores();
     })();
