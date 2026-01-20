@@ -329,7 +329,7 @@
         window.location.href = qs ? `${window.location.pathname}?${qs}` : window.location.pathname;
       }
 
-      function isBrowsingHistory() {
+      function isUsingDateParam() {
         return !!getDateParam();
       }
 
@@ -337,6 +337,16 @@
         const iso = getDateParam();
         if (iso) return fromISODateLocal(iso);
         return normalizeDate(new Date());
+      }
+
+      function getTodayLocal() {
+        return normalizeDate(new Date());
+      }
+
+      function isViewingToday() {
+        const view = getViewDate();
+        const today = getTodayLocal();
+        return toISODateLocal(view) === toISODateLocal(today);
       }
 
       function formatHeaderDate(selectedDate) {
@@ -420,7 +430,7 @@
             : visibleChores.filter((r) => r.kid.toLowerCase() === filterKid.toLowerCase());
 
         if (!rows.length) {
-          if (isBrowsingHistory()) {
+          if (!isViewingToday()) {
             const vd = getViewDate();
             choresContainer.innerHTML =
               `<p class="empty-state">No chores found for ${vd.toLocaleDateString("en-US")}. Check that date exists in the sheet.</p>`;
@@ -458,12 +468,14 @@
       function setVisibleChores() {
         const viewDate = getViewDate();
 
-        // Show Back to Today only if user is in date-browsing mode
-        backToTodayWrap.style.display = isBrowsingHistory() ? "inline" : "none";
+        // Back to Today should show on any page EXCEPT the current date page.
+        backToTodayWrap.style.display = isViewingToday() ? "none" : "inline";
 
-        if (isBrowsingHistory()) {
+        if (!isViewingToday()) {
+          // Any non-today date: match by date column == viewDate
           visibleChores = allRows.filter((row) => row.dateObj && sameDay(row.dateObj, viewDate));
         } else {
+          // Today page: original behavior, use Today = Yes
           visibleChores = allRows.filter((row) => row.todayFlag.toLowerCase() === "yes");
         }
 
@@ -501,17 +513,26 @@
         });
       }
 
+      function ensureDateParamForNav(currentViewDate) {
+        // If user is on the "today" page (no date param), convert nav clicks into a date-param state.
+        // This keeps behavior consistent and makes Back to Today logic reliable.
+        const hasParam = isUsingDateParam();
+        if (hasParam) return currentViewDate;
+        // Create a param base of "today" so next/prev moves from there.
+        return currentViewDate;
+      }
+
       function attachDayNav() {
         prevDayLink.addEventListener("click", (e) => {
           e.preventDefault();
-          const currentView = getViewDate(); // today if no ?date=
+          const currentView = ensureDateParamForNav(getViewDate());
           const target = addDays(currentView, -1);
           setDateParam(toISODateLocal(target));
         });
 
         nextDayLink.addEventListener("click", (e) => {
           e.preventDefault();
-          const currentView = getViewDate(); // today if no ?date=
+          const currentView = ensureDateParamForNav(getViewDate());
           const target = addDays(currentView, +1);
           setDateParam(toISODateLocal(target));
         });
