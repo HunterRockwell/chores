@@ -91,7 +91,7 @@
       color: var(--chip-text-active);
     }
 
-    /* Day nav (directly below boys row) */
+    /* Day nav */
     .day-nav {
       margin: 0.2rem 0 0.9rem;
       text-align: left;
@@ -185,6 +185,7 @@
       margin-top: 1.5rem;
     }
 
+    /* Mobile tweaks */
     @media (max-width: 600px) {
       .forced-labor-app {
         padding: 1.1rem 1.2rem 2.1rem;
@@ -244,13 +245,24 @@
       <a id="prev-day-link" href="#">← Previous Day</a>
       <span>&nbsp;|&nbsp;</span>
       <a id="next-day-link" href="#">Next Day →</a>
+
       <span id="back-to-today-wrap" style="display:none;">&nbsp;|&nbsp;
-        <a id="back-to-today-link" href="#">Back to Today</a>
+        <a href="index.html">Back to Today</a>
       </span>
     </div>
 
     <div id="chores-container" class="chores-container">
       <p class="empty-state">Loading chores from Google Sheets...</p>
+    </div>
+
+    <!-- Daily quote/tip area (hidden until loaded) -->
+    <div id="daily-quote-container" style="max-width:640px; margin-top:1.2rem; display:none;">
+      <div class="chore-card" style="background:#fafafa;">
+        <div class="chore-content">
+          <div id="daily-quote-title" class="chore-kid"></div>
+          <div id="daily-quote-message" class="chore-daily"></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -271,16 +283,15 @@
       const dateEl = document.getElementById("chore-date");
       const filterButtons = document.querySelectorAll(".filter-btn");
 
-      const prevDayLink = document.getElementById("prev-day-link");
-      const nextDayLink = document.getElementById("next-day-link");
       const backToTodayWrap = document.getElementById("back-to-today-wrap");
-      const backToTodayLink = document.getElementById("back-to-today-link");
+      const prevLink = document.getElementById("prev-day-link");
+      const nextLink = document.getElementById("next-day-link");
 
       let allRows = [];
       let visibleChores = [];
 
       // ---------------------------
-      // Date helpers (local-safe)
+      // Date helpers
       // ---------------------------
       function normalizeDate(d) {
         const x = new Date(d);
@@ -288,65 +299,18 @@
         return x;
       }
 
-      function pad2(n) {
-        return String(n).padStart(2, "0");
-      }
-
-      function toISODateLocal(d) {
-        const x = normalizeDate(d);
-        return `${x.getFullYear()}-${pad2(x.getMonth() + 1)}-${pad2(x.getDate())}`;
-      }
-
-      function fromISODateLocal(iso) {
-        const [y, m, day] = iso.split("-").map(Number);
-        return normalizeDate(new Date(y, m - 1, day));
-      }
-
-      function addDays(dateObj, days) {
-        const d = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
-        d.setDate(d.getDate() + days);
-        return normalizeDate(d);
-      }
-
-      function getDateParam() {
+      function getDayOffset() {
         const params = new URLSearchParams(window.location.search);
-        const iso = (params.get("date") || "").trim();
-        if (iso && /^\d{4}-\d{2}-\d{2}$/.test(iso)) return iso;
-        return "";
+        const raw = params.get("offset");
+        const n = parseInt(raw, 10);
+        return Number.isFinite(n) ? n : 0;
       }
 
-      function setDateParam(iso) {
-        const params = new URLSearchParams(window.location.search);
-        params.set("date", iso);
-        const qs = params.toString();
-        window.location.href = `${window.location.pathname}?${qs}`;
-      }
-
-      function clearDateParam() {
-        const params = new URLSearchParams(window.location.search);
-        params.delete("date");
-        const qs = params.toString();
-        window.location.href = qs ? `${window.location.pathname}?${qs}` : window.location.pathname;
-      }
-
-      function isUsingDateParam() {
-        return !!getDateParam();
-      }
-
-      function getViewDate() {
-        const iso = getDateParam();
-        if (iso) return fromISODateLocal(iso);
-        return normalizeDate(new Date());
-      }
-
-      function getTodayLocal() {
-        return normalizeDate(new Date());
-      }
-
-      function isViewingToday() {
-        const view = getViewDate();
-        const today = getTodayLocal();
-        return toISODateLocal(view) === toISODateLocal(today);
+      function getSelectedDate() {
+        const offset = getDayOffset();
+        const d = normalizeDate(new Date());
+        d.setDate(d.getDate() + offset);
+        return d;
       }
 
       function formatHeaderDate(selectedDate) {
@@ -364,6 +328,7 @@
       }
 
       function parseGvizDate(raw) {
+        // Google GViz often provides strings like "Date(2025,11,2)" where month is 0-based.
         if (!raw) return null;
 
         if (raw instanceof Date) {
@@ -374,12 +339,13 @@
           const m = raw.match(/Date\((\d+),(\d+),(\d+)\)/);
           if (m) {
             const y = parseInt(m[1], 10);
-            const month = parseInt(m[2], 10);
+            const month = parseInt(m[2], 10); // already 0-based
             const d = parseInt(m[3], 10);
             return normalizeDate(new Date(y, month, d));
           }
         }
 
+        // If it's a normal date string like "12/17/2025", try to parse
         const maybe = new Date(raw);
         if (!isNaN(maybe.getTime())) {
           return normalizeDate(maybe);
@@ -391,6 +357,39 @@
       function formatChoreDateDisplay(dateObj, fallbackRaw) {
         if (dateObj) return dateObj.toLocaleDateString("en-US");
         return (fallbackRaw ?? "").toString();
+      }
+
+      function setDayNavLinks() {
+        const offset = getDayOffset();
+        prevLink.href = `index.html?offset=${offset - 1}`;
+        nextLink.href = `index.html?offset=${offset + 1}`;
+
+        // Show "Back to Today" only if not on today
+        backToTodayWrap.style.display = offset !== 0 ? "inline" : "none";
+      }
+
+      // ---------------------------
+      // Daily quote/tip loader
+      // ---------------------------
+      async function loadDailyQuote(selectedDate) {
+        const yyyy = selectedDate.getFullYear();
+        const mm = String(selectedDate.getMonth() + 1).padStart(2, "0");
+        const dd = String(selectedDate.getDate()).padStart(2, "0");
+
+        const filePath = `daily/${yyyy}-${mm}-${dd}.json`;
+
+        try {
+          const res = await fetch(filePath, { cache: "no-store" });
+          if (!res.ok) return; // silently fail if no file exists
+
+          const data = await res.json();
+
+          document.getElementById("daily-quote-title").textContent = data.title || "Daily Note";
+          document.getElementById("daily-quote-message").textContent = data.message || "";
+          document.getElementById("daily-quote-container").style.display = "block";
+        } catch (e) {
+          // fail silently — never break chores
+        }
       }
 
       // ---------------------------
@@ -430,14 +429,8 @@
             : visibleChores.filter((r) => r.kid.toLowerCase() === filterKid.toLowerCase());
 
         if (!rows.length) {
-          if (!isViewingToday()) {
-            const vd = getViewDate();
-            choresContainer.innerHTML =
-              `<p class="empty-state">No chores found for ${vd.toLocaleDateString("en-US")}. Check that date exists in the sheet.</p>`;
-          } else {
-            choresContainer.innerHTML =
-              '<p class="empty-state">No rows are marked "Yes" in the Today column. Check the Google Sheet.</p>';
-          }
+          choresContainer.innerHTML =
+            '<p class="empty-state">No chores found for this date. Check that the date exists in the sheet.</p>';
           return;
         }
 
@@ -466,19 +459,12 @@
       }
 
       function setVisibleChores() {
-        const viewDate = getViewDate();
+        const selectedDate = getSelectedDate();
 
-        // Back to Today should show on any page EXCEPT the current date page.
-        backToTodayWrap.style.display = isViewingToday() ? "none" : "inline";
+        // Always match by date (so Previous/Next works indefinitely)
+        visibleChores = allRows.filter((row) => row.dateObj && sameDay(row.dateObj, selectedDate));
 
-        if (!isViewingToday()) {
-          // Any non-today date: match by date column == viewDate
-          visibleChores = allRows.filter((row) => row.dateObj && sameDay(row.dateObj, viewDate));
-        } else {
-          // Today page: original behavior, use Today = Yes
-          visibleChores = allRows.filter((row) => row.todayFlag.toLowerCase() === "yes");
-        }
-
+        // Keep currently selected filter button (active)
         const activeBtn = document.querySelector(".filter-btn.active");
         const activeKid = activeBtn ? activeBtn.getAttribute("data-kid") : "all";
 
@@ -513,43 +499,17 @@
         });
       }
 
-      function ensureDateParamForNav(currentViewDate) {
-        // If user is on the "today" page (no date param), convert nav clicks into a date-param state.
-        // This keeps behavior consistent and makes Back to Today logic reliable.
-        const hasParam = isUsingDateParam();
-        if (hasParam) return currentViewDate;
-        // Create a param base of "today" so next/prev moves from there.
-        return currentViewDate;
-      }
-
-      function attachDayNav() {
-        prevDayLink.addEventListener("click", (e) => {
-          e.preventDefault();
-          const currentView = ensureDateParamForNav(getViewDate());
-          const target = addDays(currentView, -1);
-          setDateParam(toISODateLocal(target));
-        });
-
-        nextDayLink.addEventListener("click", (e) => {
-          e.preventDefault();
-          const currentView = ensureDateParamForNav(getViewDate());
-          const target = addDays(currentView, +1);
-          setDateParam(toISODateLocal(target));
-        });
-
-        backToTodayLink.addEventListener("click", (e) => {
-          e.preventDefault();
-          clearDateParam();
-        });
-      }
-
       // ---------------------------
       // Init
       // ---------------------------
-      const headerDate = getViewDate();
-      formatHeaderDate(headerDate);
+      setDayNavLinks();
 
-      attachDayNav();
+      const selectedDate = getSelectedDate();
+      formatHeaderDate(selectedDate);
+
+      // Load the daily quote/tip for the selected date
+      loadDailyQuote(selectedDate);
+
       attachFilters();
       loadChores();
     })();
