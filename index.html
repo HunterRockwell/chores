@@ -22,6 +22,13 @@
   <title>Forced Labor</title>
 
   <style>
+    /* ============================
+       THEMES
+       - default is Classic (matches your current vibe)
+       - settings.html will set: localStorage.theme = "classic" | "linen" | "silk" | "dark"
+       - this page reads that and applies variables
+    ============================ */
+
     :root {
       --bg: #f5f5f7;
       --card-bg: #ffffff;
@@ -32,12 +39,77 @@
       --date-text: #666666;
       --border-radius-lg: 18px;
       --shadow-soft: 0 14px 30px rgba(0, 0, 0, 0.06);
+
+      --text-primary: rgba(0, 0, 0, 0.92);
+      --quote-divider: rgba(0, 0, 0, 0.10);
+      --quote-text: rgba(0, 0, 0, 0.72);
+      --gear-color: rgba(0, 0, 0, 0.55);
+      --nav-text: var(--chip-text);
     }
+
+    /* Smoked Linen */
+    [data-theme="linen"] {
+      --bg: #f3f2ef;
+      --card-bg: #faf9f7;
+      --chip-bg: #eceae6;
+      --chip-active-bg: #1c1c1e;
+      --chip-text: #2c6ed5;
+      --chip-text-active: #ffffff;
+      --date-text: #7a7a78;
+      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.05);
+
+      --text-primary: rgba(0, 0, 0, 0.90);
+      --quote-divider: rgba(0, 0, 0, 0.10);
+      --quote-text: rgba(0, 0, 0, 0.72);
+      --gear-color: rgba(0, 0, 0, 0.55);
+      --nav-text: var(--chip-text);
+    }
+
+    /* Midnight Silk */
+    [data-theme="silk"] {
+      --bg: #f1f2f4;
+      --card-bg: #ffffff;
+      --chip-bg: #e6e7eb;
+      --chip-active-bg: #111214;
+      --chip-text: #1f6fe5;
+      --chip-text-active: #ffffff;
+      --date-text: #6f737a;
+      --shadow-soft: 0 20px 45px rgba(15, 16, 18, 0.08);
+
+      --text-primary: rgba(0, 0, 0, 0.92);
+      --quote-divider: rgba(0, 0, 0, 0.10);
+      --quote-text: rgba(0, 0, 0, 0.72);
+      --gear-color: rgba(0, 0, 0, 0.55);
+      --nav-text: var(--chip-text);
+    }
+
+    /* Dark (iOS-like) */
+    [data-theme="dark"] {
+      --bg: #0f1012;
+      --card-bg: #1a1c1f;
+      --chip-bg: #23262b;
+      --chip-active-bg: #ffffff;
+      --chip-text: #4da3ff;
+      --chip-text-active: #0f1012;
+      --date-text: rgba(255, 255, 255, 0.62);
+      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.45);
+
+      --text-primary: rgba(255, 255, 255, 0.92);
+      --quote-divider: rgba(255, 255, 255, 0.14);
+      --quote-text: rgba(255, 255, 255, 0.75);
+      --gear-color: rgba(255, 255, 255, 0.65);
+      --nav-text: var(--chip-text);
+    }
+
+    /* ============================
+       BASE STYLES
+    ============================ */
 
     body {
       margin: 0;
       padding: 0;
       background: var(--bg);
+      color: var(--text-primary);
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
         sans-serif;
       -webkit-font-smoothing: antialiased;
@@ -49,64 +121,58 @@
       padding: 1.25rem 1.5rem 2.5rem;
     }
 
-    .forced-labor-app h1 {
-      font-size: 2.05rem;
-      margin: 0 0 0.35rem;
-      font-weight: 700;
-    }
-
-    .current-date {
-      font-size: 0.95rem;
-      color: var(--date-text);
-      margin-bottom: 0.75rem;
-    }
-
-    /* Filter chips */
-    .filter-buttons {
+    /* Header row: title + gear */
+    .header-row {
       display: flex;
-      gap: 0.5rem;
-      flex-wrap: nowrap;
-      overflow-x: auto;
-      padding: 0.25rem 0 0.7rem;
-      margin-bottom: 0.3rem;
-    }
-
-    .filter-buttons::-webkit-scrollbar {
-      display: none;
-    }
-
-    .filter-btn {
-      border: none;
-      padding: 0.35rem 0.9rem;
-      border-radius: 999px;
-      background: var(--chip-bg);
-      color: var(--chip-text);
-      cursor: pointer;
-      font-size: 0.9rem;
-      white-space: nowrap;
-    }
-
-    .filter-btn.active {
-      background: var(--chip-active-bg);
-      color: var(--chip-text-active);
-    }
-
-    /* Day nav */
-    .day-nav {
-      margin: 0.2rem 0 0.9rem;
-      text-align: left;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 0.6rem;
       max-width: 640px;
     }
 
-    .day-nav a {
-      font-size: 0.92rem;
-      color: var(--chip-text);
-      text-decoration: none;
-      font-weight: 600;
+    .forced-labor-app h1 {
+      font-size: 2.05rem;
+      margin: 0;
+      font-weight: 700;
+      letter-spacing: -0.01em;
     }
 
-    .day-nav a:hover {
-      text-decoration: underline;
+    .gear-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      text-decoration: none;
+      color: var(--gear-color);
+      background: transparent;
+      border: 1px solid rgba(0,0,0,0.06);
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    [data-theme="dark"] .gear-link {
+      border: 1px solid rgba(255,255,255,0.10);
+    }
+
+    .gear-link:hover {
+      text-decoration: none;
+    }
+
+    .gear-icon {
+      width: 20px;
+      height: 20px;
+      display: block;
+    }
+
+    /* Date moved to just above first chore box */
+    .date-above-chores {
+      font-size: 0.95rem;
+      color: var(--date-text);
+      margin: 0 0 0.75rem;
+      max-width: 640px;
     }
 
     /* Stack cards vertically & left align under title */
@@ -172,17 +238,35 @@
       font-weight: 700;
     }
 
-    .chore-date {
-      margin-top: 0.1rem;
-      font-size: 0.82rem;
-      color: var(--date-text);
-    }
-
     .empty-state,
     .error-state {
       font-size: 0.9rem;
       color: #cc3300;
       margin-top: 1.5rem;
+      max-width: 640px;
+    }
+
+    [data-theme="dark"] .empty-state,
+    [data-theme="dark"] .error-state {
+      color: #ff6b6b;
+    }
+
+    /* Day nav moved to bottom (below chores, above daily quote) */
+    .day-nav-bottom {
+      margin: 0.95rem 0 0.75rem;
+      text-align: left;
+      max-width: 640px;
+    }
+
+    .day-nav-bottom a {
+      font-size: 0.92rem;
+      color: var(--nav-text);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .day-nav-bottom a:hover {
+      text-decoration: underline;
     }
 
     /* ---------------------------
@@ -193,7 +277,7 @@
     ---------------------------- */
     .daily-quote-wrap {
       max-width: 640px;
-      margin-top: 1.1rem;
+      margin-top: 0.9rem;
       margin-left: 0;
       margin-right: auto;
       display: none; /* shown when loaded (or fallback used) */
@@ -211,7 +295,7 @@
       content: "";
       display: block;
       height: 1px;
-      background: rgba(0, 0, 0, 0.08);
+      background: var(--quote-divider);
       margin: 0.6rem 0 0.8rem;
     }
 
@@ -225,7 +309,7 @@
       margin: 0;
       font-size: 0.95rem;
       line-height: 1.35;
-      color: rgba(0, 0, 0, 0.72);
+      color: var(--quote-text);
       font-style: italic;
     }
 
@@ -239,17 +323,8 @@
         font-size: 1.9rem;
       }
 
-      .current-date {
+      .date-above-chores {
         font-size: 0.9rem;
-      }
-
-      .filter-btn {
-        padding: 0.3rem 0.8rem;
-        font-size: 0.86rem;
-      }
-
-      .day-nav a {
-        font-size: 0.88rem;
       }
 
       .chore-card {
@@ -265,8 +340,8 @@
         font-size: 0.94rem;
       }
 
-      .chore-date {
-        font-size: 0.78rem;
+      .day-nav-bottom a {
+        font-size: 0.88rem;
       }
 
       .daily-quote-title {
@@ -281,19 +356,31 @@
 </head>
 <body>
   <div class="forced-labor-app">
-    <h1>Forced Labor</h1>
-    <p id="chore-date" class="current-date"></p>
+    <!-- Title + Settings (gear) -->
+    <div class="header-row">
+      <h1>Forced Labor</h1>
 
-    <div class="filter-buttons">
-      <button class="filter-btn active" data-kid="all">All</button>
-      <button class="filter-btn" data-kid="Emmitt">Emmitt</button>
-      <button class="filter-btn" data-kid="Turner">Turner</button>
-      <button class="filter-btn" data-kid="Miles">Miles</button>
-      <button class="filter-btn" data-kid="Stewart">Stewart</button>
+      <!-- Settings page (create settings.html in same folder) -->
+      <a class="gear-link" href="settings.html" aria-label="Settings">
+        <!-- Simple gear icon (inline SVG) -->
+        <svg class="gear-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 15.25a3.25 3.25 0 1 0 0-6.5 3.25 3.25 0 0 0 0 6.5Z"
+                stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M19.4 15a7.83 7.83 0 0 0 .06-1 7.83 7.83 0 0 0-.06-1l2.02-1.58a.7.7 0 0 0 .16-.9l-1.92-3.32a.7.7 0 0 0-.85-.3l-2.38.96a7.56 7.56 0 0 0-1.73-1l-.36-2.53A.7.7 0 0 0 13.65 2h-3.3a.7.7 0 0 0-.69.58l-.36 2.53a7.56 7.56 0 0 0-1.73 1l-2.38-.96a.7.7 0 0 0-.85.3L2.42 8.77a.7.7 0 0 0 .16.9L4.6 11.25a7.83 7.83 0 0 0-.06 1c0 .34.02.67.06 1L2.58 16.83a.7.7 0 0 0-.16.9l1.92 3.32a.7.7 0 0 0 .85.3l2.38-.96c.54.42 1.12.77 1.73 1l.36 2.53a.7.7 0 0 0 .69.58h3.3a.7.7 0 0 0 .69-.58l.36-2.53c.61-.23 1.19-.58 1.73-1l2.38.96a.7.7 0 0 0 .85-.3l1.92-3.32a.7.7 0 0 0-.16-.9L19.4 15Z"
+                stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+        </svg>
+      </a>
     </div>
 
-    <!-- Day navigation -->
-    <div class="day-nav">
+    <!-- Date now sits just above chores list -->
+    <p id="date-above-chores" class="date-above-chores"></p>
+
+    <div id="chores-container" class="chores-container">
+      <p class="empty-state">Loading chores from Google Sheets...</p>
+    </div>
+
+    <!-- Day navigation moved below chores, above daily quote -->
+    <div class="day-nav-bottom">
       <a id="prev-day-link" href="#">← Previous Day</a>
       <span>&nbsp;|&nbsp;</span>
       <a id="next-day-link" href="#">Next Day →</a>
@@ -301,10 +388,6 @@
       <span id="back-to-today-wrap" style="display:none;">&nbsp;|&nbsp;
         <a href="index.html">Back to Today</a>
       </span>
-    </div>
-
-    <div id="chores-container" class="chores-container">
-      <p class="empty-state">Loading chores from Google Sheets...</p>
     </div>
 
     <!-- Daily quote/tip area (distinct; no card styling) -->
@@ -315,6 +398,21 @@
 
   <script>
     (function () {
+      // ---------------------------
+      // Apply Theme (from settings page)
+      // ---------------------------
+      function applyThemeFromStorage() {
+        const t = (localStorage.getItem("theme") || "classic").toLowerCase();
+        const allowed = ["classic", "linen", "silk", "dark"];
+        const theme = allowed.includes(t) ? t : "classic";
+        if (theme === "classic") {
+          document.documentElement.removeAttribute("data-theme");
+        } else {
+          document.documentElement.setAttribute("data-theme", theme);
+        }
+      }
+      applyThemeFromStorage();
+
       const SHEET_ID =
         "1qQEGcKsi5SW6xiZZXkZbV5rY8x7Hs1ImXt8lIXN_uzE";
       const SHEET_GID = 0;
@@ -327,8 +425,7 @@
         "&tqx=out:json";
 
       const choresContainer = document.getElementById("chores-container");
-      const dateEl = document.getElementById("chore-date");
-      const filterButtons = document.querySelectorAll(".filter-btn");
+      const dateAboveEl = document.getElementById("date-above-chores");
 
       const backToTodayWrap = document.getElementById("back-to-today-wrap");
       const prevLink = document.getElementById("prev-day-link");
@@ -363,9 +460,9 @@
         return d;
       }
 
-      function formatHeaderDate(selectedDate) {
+      function formatDateAboveChores(selectedDate) {
         const opts = { weekday: "long", month: "short", day: "numeric", year: "numeric" };
-        dateEl.textContent = selectedDate.toLocaleDateString("en-US", opts);
+        dateAboveEl.textContent = selectedDate.toLocaleDateString("en-US", opts);
       }
 
       function sameDay(a, b) {
@@ -378,7 +475,6 @@
       }
 
       function parseGvizDate(raw) {
-        // Google GViz often provides strings like "Date(2025,11,2)" where month is 0-based.
         if (!raw) return null;
 
         if (raw instanceof Date) {
@@ -389,24 +485,18 @@
           const m = raw.match(/Date\((\d+),(\d+),(\d+)\)/);
           if (m) {
             const y = parseInt(m[1], 10);
-            const month = parseInt(m[2], 10); // already 0-based
+            const month = parseInt(m[2], 10); // 0-based
             const d = parseInt(m[3], 10);
             return normalizeDate(new Date(y, month, d));
           }
         }
 
-        // If it's a normal date string like "12/17/2025", try to parse
         const maybe = new Date(raw);
         if (!isNaN(maybe.getTime())) {
           return normalizeDate(maybe);
         }
 
         return null;
-      }
-
-      function formatChoreDateDisplay(dateObj, fallbackRaw) {
-        if (dateObj) return dateObj.toLocaleDateString("en-US");
-        return (fallbackRaw ?? "").toString();
       }
 
       function setDayNavLinks() {
@@ -420,9 +510,6 @@
 
       // ---------------------------
       // Daily quote/tip loader
-      // - follows selected date
-      // - emoji rotates by date
-      // - fallback message if missing
       // ---------------------------
       function getYMD(dateObj) {
         const y = dateObj.getFullYear();
@@ -440,16 +527,25 @@
         return emojis[hash % emojis.length];
       }
 
+      function escapeHtml(str) {
+        return String(str ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#39;");
+      }
+
       function renderDailyQuote(quoteObj, selectedDate) {
         const ymd = getYMD(selectedDate);
         const emoji = emojiForDate(ymd);
 
         const title = quoteObj?.title
-          ? `${emoji} ${quoteObj.title}`
+          ? `${emoji} ${escapeHtml(quoteObj.title)}`
           : `${emoji} No wisdom today.`;
 
         const message = quoteObj?.message
-          ? quoteObj.message
+          ? escapeHtml(quoteObj.message)
           : "No wisdom today. That is the lesson.";
 
         dailyQuoteEl.innerHTML = `
@@ -467,7 +563,6 @@
         try {
           const res = await fetch(filePath, { cache: "no-store" });
 
-          // Missing file => fallback (still show something)
           if (!res.ok) {
             renderDailyQuote(null, selectedDate);
             return;
@@ -476,7 +571,6 @@
           const data = await res.json();
           renderDailyQuote(data, selectedDate);
         } catch (e) {
-          // Any error => fallback; never break chores
           renderDailyQuote(null, selectedDate);
         }
       }
@@ -494,11 +588,9 @@
 
           const rawDate = c[0]?.v ?? "";
           const dateObj = parseGvizDate(rawDate);
-          const dateDisplay = formatChoreDateDisplay(dateObj, rawDate);
 
           return {
             dateObj,
-            date: dateDisplay,
             kid: (c[1]?.v ?? "").toString().trim(),
             dailyChore: (c[2]?.v ?? "").toString().trim(),
             weeklyChore: (c[3]?.v ?? "").toString().trim(),
@@ -509,15 +601,12 @@
       }
 
       // ---------------------------
-      // Rendering
+      // Rendering (no filter UI anymore)
+      // - Date is shown once above the list
+      // - Date removed from each chore card
       // ---------------------------
-      function renderChores(filterKid) {
-        const rows =
-          filterKid === "all"
-            ? visibleChores
-            : visibleChores.filter((r) => r.kid.toLowerCase() === filterKid.toLowerCase());
-
-        if (!rows.length) {
+      function renderChores() {
+        if (!visibleChores.length) {
           choresContainer.innerHTML =
             '<p class="empty-state">No chores found for this date. Check that the date exists in the sheet.</p>';
           return;
@@ -525,21 +614,20 @@
 
         choresContainer.innerHTML = "";
 
-        rows.forEach((row) => {
+        visibleChores.forEach((row) => {
           const card = document.createElement("div");
           const kidClass = row.kid.toLowerCase();
           card.className = `chore-card ${kidClass}`;
 
           card.innerHTML = `
             <div class="chore-content">
-              <div class="chore-kid">${row.kid}</div>
+              <div class="chore-kid">${escapeHtml(row.kid)}</div>
               <div class="chore-daily">
-                <span class="label">Daily:</span> ${row.dailyChore || "—"}
+                <span class="label">Daily:</span> ${escapeHtml(row.dailyChore || "—")}
               </div>
               <div class="chore-weekly">
-                <span class="label">Weekly:</span> ${row.weeklyChore || "—"}
+                <span class="label">Weekly:</span> ${escapeHtml(row.weeklyChore || "—")}
               </div>
-              <div class="chore-date">${row.date}</div>
             </div>
           `;
 
@@ -549,15 +637,8 @@
 
       function setVisibleChores() {
         const selectedDate = getSelectedDate();
-
-        // Always match by date (so Previous/Next works indefinitely)
         visibleChores = allRows.filter((row) => row.dateObj && sameDay(row.dateObj, selectedDate));
-
-        // Keep currently selected filter button (active)
-        const activeBtn = document.querySelector(".filter-btn.active");
-        const activeKid = activeBtn ? activeBtn.getAttribute("data-kid") : "all";
-
-        renderChores(activeKid || "all");
+        renderChores();
       }
 
       async function loadChores() {
@@ -577,29 +658,15 @@
         }
       }
 
-      function attachFilters() {
-        filterButtons.forEach((btn) => {
-          btn.addEventListener("click", () => {
-            filterButtons.forEach((b) => b.classList.remove("active"));
-            btn.classList.add("active");
-            const kid = btn.getAttribute("data-kid");
-            renderChores(kid);
-          });
-        });
-      }
-
       // ---------------------------
       // Init
       // ---------------------------
       setDayNavLinks();
 
       const selectedDate = getSelectedDate();
-      formatHeaderDate(selectedDate);
+      formatDateAboveChores(selectedDate);
 
-      // Load the daily quote/tip for the selected date
       loadDailyQuote(selectedDate);
-
-      attachFilters();
       loadChores();
     })();
   </script>
