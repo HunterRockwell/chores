@@ -2,10 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
-  />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Settings</title>
 
   <style>
@@ -78,14 +75,19 @@
       letter-spacing: -0.01em;
     }
 
-    a.back {
+    /* Back button now behaves reliably in iOS standalone */
+    button.back {
+      border: none;
+      background: transparent;
       color: var(--link);
-      text-decoration: none;
       font-weight: 650;
       font-size: 0.98rem;
       white-space: nowrap;
+      padding: 0.4rem 0.2rem;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
     }
-    a.back:hover { text-decoration: underline; }
+    button.back:hover { text-decoration: underline; }
 
     .card {
       background: var(--card-bg);
@@ -157,7 +159,7 @@
   <div class="wrap">
     <div class="top">
       <h1>Settings</h1>
-      <a class="back" href="index.html">Back</a>
+      <button class="back" id="backBtn" type="button">Back</button>
     </div>
 
     <div class="card">
@@ -165,7 +167,7 @@
       <p class="sub">Pick a look. This saves on your device and applies to the chore chart.</p>
 
       <div class="themes" id="themes">
-        <button class="theme-btn" data-theme="classic">
+        <button class="theme-btn" data-theme="classic" type="button">
           <div>
             <strong>Classic iOS</strong>
             <span>Clean, neutral, high readability</span>
@@ -173,7 +175,7 @@
           <div class="pill">Selected</div>
         </button>
 
-        <button class="theme-btn" data-theme="linen">
+        <button class="theme-btn" data-theme="linen" type="button">
           <div>
             <strong>Smoked Linen</strong>
             <span>Warm, calm, quietly luxurious</span>
@@ -181,7 +183,7 @@
           <div class="pill">Select</div>
         </button>
 
-        <button class="theme-btn" data-theme="silk">
+        <button class="theme-btn" data-theme="silk" type="button">
           <div>
             <strong>Midnight Silk</strong>
             <span>Cool, modern, subtle depth</span>
@@ -189,7 +191,7 @@
           <div class="pill">Select</div>
         </button>
 
-        <button class="theme-btn" data-theme="dark">
+        <button class="theme-btn" data-theme="dark" type="button">
           <div>
             <strong>Dark</strong>
             <span>iOS-like dark mode (no neon)</span>
@@ -232,12 +234,34 @@
         return allowed.includes(t) ? t : "classic";
       }
 
-      // Init
+      // Reliable back behavior for iOS standalone
+      function goBackSafely() {
+        // If we have a referrer from the same origin, history.back() is safe.
+        try {
+          const hasHistory = window.history.length > 1;
+          if (hasHistory) {
+            window.history.back();
+            // If history.back() doesn't move (common in standalone), fall back quickly.
+            setTimeout(() => {
+              // If we’re still on settings.html, force index.
+              if (location.pathname.endsWith("settings.html")) {
+                location.href = "./index.html";
+              }
+            }, 250);
+            return;
+          }
+        } catch (e) {}
+        location.href = "./index.html";
+      }
+
+      document.getElementById("backBtn").addEventListener("click", goBackSafely);
+
+      // Init UI state
       const current = getStoredTheme();
       applyPreview(current);
       setActive(current);
 
-      // Click handlers
+      // Click handlers for theme selection
       document.getElementById("themes").addEventListener("click", (e) => {
         const btn = e.target.closest(".theme-btn");
         if (!btn) return;
@@ -250,7 +274,7 @@
         setActive(theme);
 
         // Return to main screen after selection
-        window.location.href = "index.html";
+        location.href = "./index.html";
       });
     })();
   </script>
