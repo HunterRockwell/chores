@@ -6,132 +6,132 @@
   <title>Settings</title>
 
   <style>
-    :root{
-      --bg:#f5f5f7;
-      --card:#ffffff;
-      --text:#111111;
-      --sub:#666666;
-      --link:#007aff;
-      --border: rgba(0,0,0,0.10);
-      --shadow: 0 14px 30px rgba(0,0,0,0.06);
-      --radius:18px;
+    :root {
+      --bg: #f5f5f7;
+      --card-bg: #ffffff;
+      --text: #111111;
+      --muted: rgba(0,0,0,0.60);
+      --link: #007aff;
+      --border: rgba(0,0,0,0.08);
+      --shadow: 0 14px 30px rgba(0, 0, 0, 0.06);
+      --radius: 18px;
     }
 
-    /* Theme overrides (applied via html[data-theme="..."]) */
-    html[data-theme="classic"]{
-      --bg:#f5f5f7; --card:#ffffff; --text:#111111; --sub:#666666; --link:#007aff; --border: rgba(0,0,0,0.10);
-    }
-    html[data-theme="linen"]{
-      --bg:#f3efe8; --card:#ffffff; --text:#1a1a1a; --sub:#6b5f54; --link:#7a5cff; --border: rgba(0,0,0,0.10);
-    }
-    html[data-theme="midnight"]{
-      --bg:#eef2f6; --card:#ffffff; --text:#0f172a; --sub:#556070; --link:#3b82f6; --border: rgba(15,23,42,0.12);
-    }
-    html[data-theme="dark"]{
-      --bg:#0b0f14; --card:#121825; --text:#e6edf3; --sub:#9aa4b2; --link:#5aa7ff; --border: rgba(255,255,255,0.10);
-      --shadow: 0 14px 30px rgba(0,0,0,0.45);
-    }
-
-    body{
-      margin:0;
-      padding:0;
+    body {
+      margin: 0;
+      padding: 0;
       background: var(--bg);
+      color: var(--text);
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
       -webkit-font-smoothing: antialiased;
-      color: var(--text);
     }
 
-    .wrap{
-      max-width: 860px;
+    .wrap {
+      max-width: 760px;
       margin: 0 auto;
-      padding: 1.25rem 1.5rem 2.5rem;
+      padding: 1.25rem 1.25rem 2.5rem;
     }
 
-    .topbar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      margin-bottom: 0.8rem;
+    .topbar {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
     }
 
-    h1{
-      margin:0;
-      font-size: 2.0rem;
-      font-weight: 750;
-      letter-spacing: -0.02em;
-    }
-
-    a.back{
-      color: var(--link);
-      text-decoration:none;
-      font-weight: 650;
-    }
-    a.back:hover{ text-decoration: underline; }
-
-    .panel{
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 1rem;
-      max-width: 640px;
-    }
-
-    .section-title{
-      font-weight: 750;
+    h1 {
       margin: 0;
+      font-size: 2.05rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .back {
+      color: var(--link);
+      text-decoration: none;
+      font-weight: 600;
       font-size: 1.05rem;
     }
-    .section-sub{
-      margin: 0.25rem 0 0.9rem;
-      color: var(--sub);
-      font-size: 0.95rem;
+
+    .panel {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.1rem 1.1rem 1.0rem;
+      border: 1px solid var(--border);
     }
 
-    .theme-row{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 1rem;
+    .section-title {
+      font-weight: 800;
+      font-size: 1.1rem;
+      margin: 0 0 0.2rem;
+    }
+
+    .section-sub {
+      margin: 0 0 1rem;
+      color: var(--muted);
+      font-size: 0.98rem;
+      line-height: 1.25;
+    }
+
+    .theme-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+
+    .theme-row {
       border: 1px solid var(--border);
       border-radius: 14px;
       padding: 0.9rem 0.95rem;
-      margin-bottom: 0.75rem;
-      background: rgba(255,255,255,0.45);
-    }
-    html[data-theme="dark"] .theme-row{
-      background: rgba(255,255,255,0.03);
-    }
-
-    .theme-name{
-      font-weight: 750;
-      margin:0;
-      font-size: 1rem;
-      line-height: 1.1;
-    }
-    .theme-desc{
-      margin: 0.2rem 0 0;
-      color: var(--sub);
-      font-size: 0.92rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.9rem;
+      background: rgba(255,255,255,0.65);
     }
 
-    .btn{
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--text);
+    .theme-meta {
+      min-width: 0;
+    }
+
+    .theme-name {
+      font-weight: 800;
+      margin: 0;
+      font-size: 1.02rem;
+    }
+
+    .theme-desc {
+      margin: 0.12rem 0 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.25;
+    }
+
+    .btn {
+      border: 1px solid rgba(0,0,0,0.18);
+      background: #ffffff;
+      color: #111;
+      padding: 0.35rem 0.85rem;
       border-radius: 999px;
-      padding: 0.35rem 0.8rem;
-      font-weight: 650;
-      cursor:pointer;
-      white-space: nowrap;
-    }
-    .btn.selected{
-      border-color: var(--text);
+      font-weight: 700;
+      cursor: pointer;
+      flex: 0 0 auto;
     }
 
-    @media (max-width: 600px){
-      .wrap{ padding: 1.1rem 1.2rem 2.1rem; }
-      h1{ font-size: 1.9rem; }
-      .panel{ max-width: 640px; }
+    .btn.selected {
+      background: #111;
+      color: #fff;
+      border-color: #111;
+    }
+
+    @media (max-width: 600px) {
+      .wrap { padding: 1.1rem 1.05rem 2.1rem; }
+      h1 { font-size: 1.9rem; }
+      .back { font-size: 1.0rem; }
+      .theme-row { padding: 0.85rem 0.9rem; }
     }
   </style>
 </head>
@@ -144,72 +144,65 @@
     </div>
 
     <div class="panel">
-      <p class="section-title">Theme</p>
+      <div class="section-title">Theme</div>
       <p class="section-sub">Pick a look. This saves on your device and applies to the chore chart.</p>
 
-      <div class="theme-row">
-        <div>
-          <p class="theme-name">Classic iOS</p>
-          <p class="theme-desc">Clean, neutral, high readability</p>
-        </div>
-        <button class="btn theme-btn" data-theme="classic">Select</button>
-      </div>
-
-      <div class="theme-row">
-        <div>
-          <p class="theme-name">Smoked Linen</p>
-          <p class="theme-desc">Warm, calm, quietly luxurious</p>
-        </div>
-        <button class="btn theme-btn" data-theme="linen">Select</button>
-      </div>
-
-      <div class="theme-row">
-        <div>
-          <p class="theme-name">Midnight Silk</p>
-          <p class="theme-desc">Cool, modern, subtle depth</p>
-        </div>
-        <button class="btn theme-btn" data-theme="midnight">Select</button>
-      </div>
-
-      <div class="theme-row">
-        <div>
-          <p class="theme-name">Dark</p>
-          <p class="theme-desc">iOS-like dark mode (no neon)</p>
-        </div>
-        <button class="btn theme-btn" data-theme="dark">Select</button>
-      </div>
+      <div id="theme-list" class="theme-list"></div>
     </div>
   </div>
 
   <script>
-    (function(){
-      const allowed = ["classic","linen","midnight","dark"];
-      const saved = localStorage.getItem("theme") || "classic";
-      document.documentElement.setAttribute("data-theme", allowed.includes(saved) ? saved : "classic");
+    (function () {
+      // Keep this list in sync with index.html THEMES
+      const THEMES = [
+        { key: "classic", name: "Classic iOS", desc: "Clean, neutral, high readability" },
+        { key: "canyon",  name: "Canyon Clay", desc: "Warm, grounded, earthy contrast" },
+        { key: "forest",  name: "Forest Slate", desc: "Cool, refined, dark-green depth" },
+        { key: "dark",    name: "Dark",        desc: "iOS-like dark mode (no neon)" }
+      ];
 
-      function setActive(theme){
-        document.querySelectorAll(".theme-btn").forEach(btn=>{
-          const t = btn.getAttribute("data-theme");
-          const isSel = t === theme;
-          btn.textContent = isSel ? "Selected" : "Select";
-          btn.classList.toggle("selected", isSel);
+      const list = document.getElementById("theme-list");
+      const current = (localStorage.getItem("theme") || "classic").toLowerCase();
+
+      function render() {
+        list.innerHTML = "";
+
+        THEMES.forEach((t) => {
+          const row = document.createElement("div");
+          row.className = "theme-row";
+
+          const meta = document.createElement("div");
+          meta.className = "theme-meta";
+
+          const name = document.createElement("p");
+          name.className = "theme-name";
+          name.textContent = t.name;
+
+          const desc = document.createElement("p");
+          desc.className = "theme-desc";
+          desc.textContent = t.desc;
+
+          meta.appendChild(name);
+          meta.appendChild(desc);
+
+          const btn = document.createElement("button");
+          btn.className = "btn" + (t.key === current ? " selected" : "");
+          btn.textContent = t.key === current ? "Selected" : "Select";
+
+          btn.addEventListener("click", () => {
+            localStorage.setItem("theme", t.key);
+            // go back to main after selecting
+            window.location.href = "./index.html";
+          });
+
+          row.appendChild(meta);
+          row.appendChild(btn);
+
+          list.appendChild(row);
         });
       }
-      setActive(saved);
 
-      document.addEventListener("click", (e)=>{
-        const btn = e.target.closest(".theme-btn");
-        if(!btn) return;
-        const theme = btn.getAttribute("data-theme");
-        if(!allowed.includes(theme)) return;
-
-        localStorage.setItem("theme", theme);
-        document.documentElement.setAttribute("data-theme", theme);
-        setActive(theme);
-
-        // Return to main screen
-        location.href = "./index.html";
-      });
+      render();
     })();
   </script>
 </body>
