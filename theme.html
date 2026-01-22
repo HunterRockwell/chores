@@ -1,1 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Pick a theme</title>
+  <style>
+    :root{
+      --bg:#f5f5f7; --card:#ffffff; --text:#111; --sub:#6b6b6f; --link:#007aff;
+      --radius:18px; --shadow:0 14px 30px rgba(0,0,0,.06); --divider:rgba(0,0,0,.08);
+      --btn:#f2f2f2; --btnText:#111;
+    }
 
+    /* Theme tokens (apply to page chrome as well) */
+    html[data-theme="classic"]{ --bg:#f5f5f7; --card:#ffffff; --text:#111; --sub:#6b6b6f; --link:#007aff; --btn:#f2f2f2; --btnText:#111; }
+    html[data-theme="linen"]  { --bg:#f3f0ea; --card:#ffffff; --text:#141312; --sub:#6f6a63; --link:#2f6fff; --btn:#efe8dd; --btnText:#141312; }
+    html[data-theme="silk"]   { --bg:#f2f4f8; --card:#ffffff; --text:#111318; --sub:#646a76; --link:#3b6cff; --btn:#e9eef8; --btnText:#111318; }
+    html[data-theme="noir"]   { --bg:#0f1115; --card:#171a21; --text:#f2f4f8; --sub:#a7adbb; --link:#6aa9ff; --btn:#232836; --btnText:#f2f4f8; }
+
+    body{
+      margin:0;background:var(--bg);color:var(--text);
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;
+      -webkit-font-smoothing:antialiased;
+    }
+    .wrap{max-width:960px;margin:0 auto;padding:1.25rem 1.5rem 2.5rem;}
+    .top{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;max-width:640px;}
+    h1{margin:0;font-size:2.05rem;font-weight:750;letter-spacing:-.02em;}
+    .back{margin-top:.35rem;font-weight:650;color:var(--link);text-decoration:none;font-size:1rem;}
+    .sub{max-width:640px;margin:.5rem 0 0;color:var(--sub);font-size:.98rem;}
+
+    .card{
+      max-width:640px;margin-top:1rem;background:var(--card);border-radius:var(--radius);
+      box-shadow:var(--shadow);overflow:hidden;
+      border:1px solid rgba(0,0,0,.04);
+    }
+    html[data-theme="noir"] .card{border:1px solid rgba(255,255,255,.06);}
+
+    .row{
+      display:flex;align-items:center;justify-content:space-between;gap:1rem;
+      padding:1rem 1.05rem;border-bottom:1px solid var(--divider);
+    }
+    html[data-theme="noir"] .row{border-bottom:1px solid rgba(255,255,255,.08);}
+    .row:last-child{border-bottom:none;}
+    .left .title{font-weight:800;margin:0 0 .15rem;font-size:1.02rem;}
+    .left .desc{margin:0;color:var(--sub);font-size:.95rem;}
+
+    .btn{
+      border:none;border-radius:999px;padding:.42rem .9rem;
+      background:var(--btn);color:var(--btnText);
+      font-weight:750;font-size:.92rem;
+    }
+    .btn.selected{
+      outline:2px solid var(--link);
+      background:transparent;
+      color:var(--text);
+    }
+
+    @media (max-width:600px){
+      .wrap{padding:1.1rem 1.2rem 2.1rem;}
+      h1{font-size:1.9rem;}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <h1>Pick a theme</h1>
+        <p class="sub">This saves on your device and applies to the chore chart.</p>
+      </div>
+      <a class="back" href="settings.html">Back</a>
+    </div>
+
+    <div class="card" id="themeList">
+      <!-- rows injected -->
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const THEMES = [
+        { key:"classic", name:"Classic iOS", desc:"Clean, neutral, high readability" },
+        { key:"linen",   name:"Smoked Linen", desc:"Warm, calm, quietly luxurious" },
+        { key:"silk",    name:"Midnight Silk", desc:"Cool, modern, subtle depth" },
+        { key:"noir",    name:"Noir (dark)", desc:"iOS-like dark mode (no neon)" }
+      ];
+
+      const list = document.getElementById("themeList");
+
+      function applyTheme(key){
+        document.documentElement.setAttribute("data-theme", key);
+      }
+
+      function render(){
+        const current = localStorage.getItem("theme") || "classic";
+        applyTheme(current);
+
+        list.innerHTML = "";
+        THEMES.forEach(t => {
+          const row = document.createElement("div");
+          row.className = "row";
+          row.innerHTML = `
+            <div class="left">
+              <p class="title">${t.name}</p>
+              <p class="desc">${t.desc}</p>
+            </div>
+            <button class="btn ${t.key===current ? "selected":""}" data-theme="${t.key}">
+              ${t.key===current ? "Selected" : "Select"}
+            </button>
+          `;
+          list.appendChild(row);
+        });
+      }
+
+      list.addEventListener("click", (e) => {
+        const btn = e.target.closest("button[data-theme]");
+        if (!btn) return;
+        const key = btn.getAttribute("data-theme");
+        localStorage.setItem("theme", key);
+        applyTheme(key);
+        render();
+        // back to settings so it feels native
+        location.href = "settings.html";
+      });
+
+      render();
+    })();
+  </script>
+</body>
+</html>
