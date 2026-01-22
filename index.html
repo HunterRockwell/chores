@@ -3,226 +3,606 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="apple-touch-icon" sizes="192x192" href="icons/forced-labor-icon-192.png" />
   <title>Forced Labor</title>
 
   <style>
-    :root {
-      --bg: #f5f5f7;
-      --card-bg: #ffffff;
-      --text-main: #111;
-      --text-muted: #666;
-      --accent: #007aff;
-      --danger: #cc0000;
-      --radius: 18px;
-      --shadow: 0 14px 30px rgba(0,0,0,0.06);
+    :root{
+      --bg:#f5f5f7;
+      --card-bg:#ffffff;
+      --date-text:#666666;
+      --link:#007aff;
+      --border-radius-lg:18px;
+      --shadow-soft:0 14px 30px rgba(0,0,0,0.06);
     }
 
-    body {
-      margin: 0;
-      background: var(--bg);
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-      color: var(--text-main);
+    /* Theme overrides (set on <html data-theme="..."> by JS) */
+    html[data-theme="classic"]{
+      --bg:#f5f5f7;
+      --card-bg:#ffffff;
+      --date-text:#666666;
+      --link:#007aff;
+    }
+    html[data-theme="linen"]{
+      --bg:#f3efe8;
+      --card-bg:#ffffff;
+      --date-text:#6b625c;
+      --link:#2f6fed;
+    }
+    html[data-theme="midnight"]{
+      --bg:#eef1f6;
+      --card-bg:#ffffff;
+      --date-text:#5b6472;
+      --link:#2b6cb0;
+    }
+    html[data-theme="dark"]{
+      --bg:#0f1115;
+      --card-bg:#171a21;
+      --date-text:#a8b0bf;
+      --link:#6aa9ff;
+      --shadow-soft:0 14px 30px rgba(0,0,0,0.40);
+      color-scheme: dark;
     }
 
-    .app {
-      max-width: 640px;
-      margin: 0 auto;
-      padding: 1.2rem 1.3rem 2.5rem;
+    body{
+      margin:0;
+      padding:0;
+      background:var(--bg);
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;
+      -webkit-font-smoothing:antialiased;
     }
 
-    h1 {
-      font-size: 2rem;
-      margin: 0 0 0.25rem;
-      font-weight: 700;
+    .app{
+      max-width:960px;
+      margin:0 auto;
+      padding:1.25rem 1.5rem 2.5rem;
     }
 
-    .date {
-      font-size: 0.95rem;
-      color: var(--text-muted);
-      margin-bottom: 0.8rem;
+    .topbar{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:0.75rem;
     }
 
-    .chores {
-      display: flex;
-      flex-direction: column;
-      gap: 0.7rem;
+    h1{
+      font-size:2.05rem;
+      margin:0 0 0.25rem;
+      font-weight:800;
+      letter-spacing:-0.02em;
     }
 
-    .card {
-      background: var(--card-bg);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 0.9rem 1.1rem;
+    .settings-btn{
+      border:none;
+      background:transparent;
+      padding:0.35rem 0.25rem;
+      margin-top:0.15rem;
+      cursor:pointer;
+      color:var(--link);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:10px;
     }
 
-    .kid {
-      font-weight: 650;
-      font-size: 1.05rem;
-      margin-bottom: 0.2rem;
+    .settings-btn:active{
+      opacity:0.7;
     }
 
-    .line {
-      font-size: 0.97rem;
+    .settings-btn svg{
+      width:22px;
+      height:22px;
+      display:block;
     }
 
-    .label {
-      font-weight: 700;
+    .current-date{
+      font-size:0.95rem;
+      color:var(--date-text);
+      margin:0.1rem 0 0.85rem;
     }
 
-    .nav {
-      margin-top: 1rem;
-      font-size: 0.9rem;
+    /* Chore cards */
+    .chores{
+      display:flex;
+      flex-direction:column;
+      gap:0.7rem;
+      max-width:640px;
+      margin-left:0;
+      margin-right:auto;
     }
 
-    .nav a {
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 600;
+    .card{
+      border-radius:var(--border-radius-lg);
+      padding:0.95rem 1.1rem;
+      background:var(--card-bg);
+      box-shadow:var(--shadow-soft);
     }
 
-    .nav a:hover {
-      text-decoration: underline;
+    .kid{
+      font-weight:800;
+      font-size:1.02rem;
+      margin-bottom:0.2rem;
     }
 
-    .message-wrap {
-      margin-top: 1.2rem;
-      display: none;
+    .line{
+      font-size:0.97rem;
+      margin:0.1rem 0;
     }
 
-    .divider {
-      height: 1px;
-      background: rgba(0,0,0,0.12);
-      margin: 0.8rem 0;
+    .label{
+      font-weight:800;
     }
 
-    .message-title {
-      font-weight: 800;
-      font-size: 1.05rem;
-      margin-bottom: 0.2rem;
+    .empty-state,.error-state{
+      font-size:0.95rem;
+      margin-top:1.2rem;
+      max-width:640px;
+    }
+    .error-state{ color:#cc3300; }
+
+    /* Day nav moved to bottom (below chores, above daily message) */
+    .day-nav{
+      max-width:640px;
+      margin:0.9rem 0 0.6rem;
+      text-align:left;
+    }
+    .day-nav a{
+      font-size:0.92rem;
+      color:var(--link);
+      text-decoration:none;
+      font-weight:700;
+    }
+    .day-nav a:hover{ text-decoration:underline; }
+
+    /* Daily message module (no card styling; sits on background) */
+    .daily-wrap{
+      max-width:640px;
+      margin-top:0.5rem;
+      margin-left:0;
+      margin-right:auto;
+      display:none;
+    }
+    .daily{
+      padding:0.2rem 0 0.6rem;
+      margin:0;
+    }
+    .daily::before{
+      content:"";
+      display:block;
+      height:1px;
+      background:rgba(0,0,0,0.08);
+      margin:0.6rem 0 0.8rem;
+    }
+    html[data-theme="dark"] .daily::before{
+      background:rgba(255,255,255,0.12);
     }
 
-    .message-text {
-      font-style: italic;
-      font-size: 0.96rem;
-      line-height: 1.35;
-      color: rgba(0,0,0,0.75);
+    .daily-title{
+      font-weight:900;
+      font-size:0.98rem;
+      margin:0 0 0.25rem;
     }
 
-    .trash {
-      color: var(--danger);
-      font-weight: 900;
-      font-size: 1.25rem;
-      letter-spacing: 0.04em;
-      white-space: nowrap;
+    .daily-msg{
+      margin:0;
+      font-size:0.95rem;
+      line-height:1.35;
+      color:rgba(0,0,0,0.72);
+      font-style:italic;
+    }
+    html[data-theme="dark"] .daily-msg{
+      color:rgba(255,255,255,0.78);
+    }
+
+    /* Thursday trash override */
+    .trash{
+      color:#d00000;
+      font-weight:950;
+      letter-spacing:0.02em;
+      font-style:normal;
+      font-size:1.18rem;
+      line-height:1.1;
+      white-space:nowrap;
+    }
+
+    /* Pulse animation (Thursday only) */
+    @keyframes pulseTrash{
+      0%   { transform:scale(1);   opacity:1; }
+      50%  { transform:scale(1.08); opacity:0.92; }
+      100% { transform:scale(1);   opacity:1; }
+    }
+    .trash.pulse{
+      display:inline-block;
+      transform-origin:left center;
+      animation:pulseTrash 0.9s ease-in-out infinite;
+    }
+
+    /* Admin-only regenerate button */
+    .admin-regenerate{
+      position:fixed;
+      right:14px;
+      bottom:14px;
+      z-index:9999;
+      width:44px;
+      height:44px;
+      border-radius:999px;
+      border:none;
+      background:rgba(0,0,0,0.12);
+      backdrop-filter:blur(10px);
+      -webkit-backdrop-filter:blur(10px);
+      box-shadow:0 10px 18px rgba(0,0,0,0.18);
+      display:none; /* enabled by JS if admin */
+      cursor:pointer;
+    }
+    html[data-theme="dark"] .admin-regenerate{
+      background:rgba(255,255,255,0.10);
+      box-shadow:0 10px 18px rgba(0,0,0,0.45);
+    }
+    .admin-regenerate svg{
+      width:20px;
+      height:20px;
+      display:block;
+      margin:0 auto;
+      color:rgba(0,0,0,0.80);
+    }
+    html[data-theme="dark"] .admin-regenerate svg{
+      color:rgba(255,255,255,0.85);
+    }
+
+    @media (max-width:600px){
+      .app{ padding:1.1rem 1.2rem 2.1rem; }
+      h1{ font-size:1.9rem; }
+      .current-date{ font-size:0.9rem; }
+      .card{ padding:0.85rem 1rem; }
+      .kid{ font-size:1rem; }
+      .line{ font-size:0.94rem; }
+      .day-nav a{ font-size:0.88rem; }
+      .daily-title{ font-size:0.95rem; }
+      .daily-msg{ font-size:0.92rem; }
+      .trash{ font-size:1.12rem; }
     }
   </style>
 </head>
 
 <body>
-<div class="app">
-  <h1>Forced Labor</h1>
-  <div id="date" class="date"></div>
+  <div class="app">
+    <div class="topbar">
+      <div>
+        <h1>Forced Labor</h1>
+        <p id="header-date" class="current-date"></p>
+      </div>
 
-  <div id="chores" class="chores"></div>
+      <!-- Hamburger / Settings -->
+      <button class="settings-btn" id="settingsBtn" aria-label="Settings" title="Settings">
+        <!-- simple hamburger icon -->
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
 
-  <div class="nav">
-    <a id="prev" href="#">← Previous Day</a>
-    &nbsp;|&nbsp;
-    <a id="next" href="#">Next Day →</a>
-    <span id="todayWrap" style="display:none;">
-      &nbsp;|&nbsp;<a href="index.html">Back to Today</a>
-    </span>
+    <div id="chores" class="chores">
+      <p class="empty-state">Loading chores from Google Sheets...</p>
+    </div>
+
+    <!-- Day navigation (moved to bottom) -->
+    <div class="day-nav">
+      <a id="prevLink" href="#">← Previous Day</a>
+      <span>&nbsp;|&nbsp;</span>
+      <a id="nextLink" href="#">Next Day →</a>
+      <span id="backWrap" style="display:none;">&nbsp;|&nbsp;<a href="index.html">Back to Today</a></span>
+    </div>
+
+    <!-- Daily quote / Thursday override -->
+    <div id="dailyWrap" class="daily-wrap">
+      <div id="daily" class="daily"></div>
+    </div>
   </div>
 
-  <div id="messageWrap" class="message-wrap">
-    <div class="divider"></div>
-    <div id="message"></div>
-  </div>
-</div>
+  <!-- Admin-only regenerate button -->
+  <button id="regenBtn" class="admin-regenerate" title="Regenerate message" aria-label="Regenerate message">
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M20 12a8 8 0 1 1-2.34-5.66" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <path d="M20 4v6h-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
 
-<script>
-(() => {
-  const SHEET_ID = "1qQEGcKsi5SW6xiZZXkZbV5rY8x7Hs1ImXt8lIXN_uzE";
-  const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+  <script>
+    (function () {
+      // ----------------------------
+      // Theme application (localStorage)
+      // ----------------------------
+      const THEME_KEY = "theme";
+      const theme = localStorage.getItem(THEME_KEY) || "linen"; // default to your sultry one
+      document.documentElement.setAttribute("data-theme", theme);
 
-  const choresEl = document.getElementById("chores");
-  const dateEl = document.getElementById("date");
-  const messageWrap = document.getElementById("messageWrap");
-  const messageEl = document.getElementById("message");
-
-  const params = new URLSearchParams(location.search);
-  const offset = parseInt(params.get("offset") || "0", 10);
-
-  const now = new Date(
-    new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" })
-  );
-  now.setHours(0,0,0,0);
-  now.setDate(now.getDate() + offset);
-
-  const weekday = now.getDay(); // 4 = Thursday
-  const ymd = now.toISOString().slice(0,10);
-
-  dateEl.textContent = now.toLocaleDateString("en-US", {
-    weekday: "long", month: "short", day: "numeric", year: "numeric"
-  });
-
-  document.getElementById("prev").href = `?offset=${offset-1}`;
-  document.getElementById("next").href = `?offset=${offset+1}`;
-  document.getElementById("todayWrap").style.display = offset !== 0 ? "inline" : "none";
-
-  fetch(URL)
-    .then(r => r.text())
-    .then(txt => {
-      const json = JSON.parse(txt.substring(txt.indexOf("{"), txt.lastIndexOf("}")+1));
-      const rows = json.table.rows || [];
-
-      rows.forEach(r => {
-        const d = r.c[0]?.v;
-        if (!d) return;
-
-        const m = d.match(/Date\((\d+),(\d+),(\d+)\)/);
-        if (!m) return;
-
-        const rowDate = new Date(m[1], m[2], m[3]);
-        rowDate.setHours(0,0,0,0);
-
-        if (rowDate.getTime() !== now.getTime()) return;
-
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `
-          <div class="kid">${r.c[1]?.v}</div>
-          <div class="line"><span class="label">Daily:</span> ${r.c[2]?.v}</div>
-          <div class="line"><span class="label">Weekly:</span> ${r.c[3]?.v}</div>
-        `;
-        choresEl.appendChild(card);
+      // ----------------------------
+      // Settings button → settings menu
+      // ----------------------------
+      document.getElementById("settingsBtn").addEventListener("click", () => {
+        location.href = "settings.html";
       });
-    });
 
-  // MESSAGE LOGIC
-  messageWrap.style.display = "block";
+      // ----------------------------
+      // Sheet config
+      // ----------------------------
+      const SHEET_ID = "1qQEGcKsi5SW6xiZZXkZbV5rY8x7Hs1ImXt8lIXN_uzE";
+      const SHEET_GID = 0;
 
-  if (weekday === 4) {
-    messageEl.innerHTML = `<div class="trash">TAKE TRASH TO ROAD</div>`;
-    return;
-  }
+      const sheetUrl =
+        "https://docs.google.com/spreadsheets/d/" +
+        SHEET_ID +
+        "/gviz/tq?gid=" +
+        SHEET_GID +
+        "&tqx=out:json";
 
-  fetch(`daily/${ymd}.json`, { cache: "no-store" })
-    .then(r => r.ok ? r.json() : null)
-    .then(d => {
-      if (!d) {
-        messageEl.innerHTML = `
-          <div class="message-title">💭 No wisdom today.</div>
-          <div class="message-text">That is the lesson.</div>`;
-        return;
+      const choresEl = document.getElementById("chores");
+      const headerDateEl = document.getElementById("header-date");
+
+      const prevLink = document.getElementById("prevLink");
+      const nextLink = document.getElementById("nextLink");
+      const backWrap = document.getElementById("backWrap");
+
+      const dailyWrap = document.getElementById("dailyWrap");
+      const dailyEl = document.getElementById("daily");
+
+      // Admin / regen
+      const regenBtn = document.getElementById("regenBtn");
+      const ADMIN_KEY = "admin_enabled";
+      const MAKE_HOOK_KEY = "make_regen_hook"; // set once on your phone in Settings → Admin Tools
+      const adminEnabled = localStorage.getItem(ADMIN_KEY) === "1";
+
+      if (adminEnabled) regenBtn.style.display = "block";
+
+      // ----------------------------
+      // Date helpers
+      // ----------------------------
+      function normalizeDate(d){
+        const x = new Date(d);
+        x.setHours(0,0,0,0);
+        return x;
       }
 
-      messageEl.innerHTML = `
-        <div class="message-title">💡 ${d.title}</div>
-        <div class="message-text">${d.message}</div>`;
-    });
-})();
-</script>
+      function getDayOffset(){
+        const params = new URLSearchParams(location.search);
+        const raw = params.get("offset");
+        const n = parseInt(raw, 10);
+        return Number.isFinite(n) ? n : 0;
+      }
+
+      function getSelectedDate(){
+        const offset = getDayOffset();
+        const d = normalizeDate(new Date());
+        d.setDate(d.getDate() + offset);
+        return d;
+      }
+
+      function formatHeaderDate(d){
+        const opts = { weekday:"long", month:"short", day:"numeric", year:"numeric" };
+        headerDateEl.textContent = d.toLocaleDateString("en-US", opts);
+      }
+
+      function getYMD(d){
+        const y = d.getFullYear();
+        const m = String(d.getMonth()+1).padStart(2,"0");
+        const day = String(d.getDate()).padStart(2,"0");
+        return `${y}-${m}-${day}`;
+      }
+
+      function sameDay(a,b){
+        return a && b &&
+          a.getFullYear()===b.getFullYear() &&
+          a.getMonth()===b.getMonth() &&
+          a.getDate()===b.getDate();
+      }
+
+      function setDayNavLinks(){
+        const offset = getDayOffset();
+        prevLink.href = `index.html?offset=${offset-1}`;
+        nextLink.href = `index.html?offset=${offset+1}`;
+        backWrap.style.display = offset !== 0 ? "inline" : "none";
+      }
+
+      // ----------------------------
+      // GViz parsing
+      // ----------------------------
+      function parseGvizDate(raw){
+        if (!raw) return null;
+
+        if (raw instanceof Date){
+          return normalizeDate(raw);
+        }
+
+        if (typeof raw === "string" && raw.includes("Date(")){
+          const m = raw.match(/Date\((\d+),(\d+),(\d+)\)/);
+          if (m){
+            const y = parseInt(m[1],10);
+            const mo = parseInt(m[2],10);
+            const d = parseInt(m[3],10);
+            return normalizeDate(new Date(y, mo, d));
+          }
+        }
+
+        const maybe = new Date(raw);
+        if (!isNaN(maybe.getTime())) return normalizeDate(maybe);
+        return null;
+      }
+
+      function parseSheetResponse(text){
+        const jsonText = text.substring(text.indexOf("{"), text.lastIndexOf("}")+1);
+        const obj = JSON.parse(jsonText);
+        const rows = obj.table.rows || [];
+
+        return rows.map(r => {
+          const c = r.c || [];
+          const rawDate = c[0]?.v ?? "";
+          const dateObj = parseGvizDate(rawDate);
+
+          return {
+            dateObj,
+            kid: (c[1]?.v ?? "").toString().trim(),
+            dailyChore: (c[2]?.v ?? "").toString().trim(),
+            weeklyChore: (c[3]?.v ?? "").toString().trim()
+          };
+        });
+      }
+
+      // ----------------------------
+      // Render chores (no date inside cards)
+      // ----------------------------
+      function renderChores(rows){
+        if (!rows.length){
+          choresEl.innerHTML = '<p class="empty-state">No chores found for this date. Check that the date exists in the sheet.</p>';
+          return;
+        }
+
+        choresEl.innerHTML = "";
+        rows.forEach(row => {
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+            <div class="kid">${row.kid}</div>
+            <div class="line"><span class="label">Daily:</span> ${row.dailyChore || "—"}</div>
+            <div class="line"><span class="label">Weekly:</span> ${row.weeklyChore || "—"}</div>
+          `;
+          choresEl.appendChild(card);
+        });
+      }
+
+      // ----------------------------
+      // Daily message
+      //  - rolls by selected date
+      //  - Thursday override: pulsing TAKE TRASH TO ROAD
+      // ----------------------------
+      function isThursdayLocal(selectedDate){
+        // 0 Sun .. 4 Thu
+        return selectedDate.getDay() === 4;
+      }
+
+      function renderThursdayTrash(){
+        dailyEl.innerHTML = `
+          <div class="daily-title"></div>
+          <p class="daily-msg trash pulse">TAKE TRASH TO ROAD</p>
+        `;
+        dailyWrap.style.display = "block";
+      }
+
+      function emojiForDate(ymd){
+        const emojis = ["🧽","🧠","💡","😈","🛠️","🧼","⚡","🧯","🪠","🧻"];
+        let hash = 0;
+        for (let i=0;i<ymd.length;i++){
+          hash = (hash*31 + ymd.charCodeAt(i)) >>> 0;
+        }
+        return emojis[hash % emojis.length];
+      }
+
+      function renderDailyMessage(obj, selectedDate){
+        const ymd = getYMD(selectedDate);
+        const emoji = emojiForDate(ymd);
+
+        const title = obj?.title ? `${emoji} ${obj.title}` : `${emoji} No wisdom today.`;
+        const msg   = obj?.message ? obj.message : "No wisdom today. That is the lesson.";
+
+        dailyEl.innerHTML = `
+          <div class="daily-title">${title}</div>
+          <p class="daily-msg">${msg}</p>
+        `;
+        dailyWrap.style.display = "block";
+      }
+
+      async function loadDailyMessage(selectedDate){
+        if (isThursdayLocal(selectedDate)){
+          renderThursdayTrash();
+          return;
+        }
+
+        const ymd = getYMD(selectedDate);
+        const filePath = `daily/${ymd}.json`;
+
+        try{
+          const res = await fetch(filePath, { cache:"no-store" });
+          if (!res.ok){
+            renderDailyMessage(null, selectedDate);
+            return;
+          }
+          const data = await res.json();
+          renderDailyMessage(data, selectedDate);
+        } catch (e){
+          renderDailyMessage(null, selectedDate);
+        }
+      }
+
+      // ----------------------------
+      // Admin regenerate (Option A via Make webhook)
+      // ----------------------------
+      async function regenerateForSelectedDate(){
+        const hook = localStorage.getItem(MAKE_HOOK_KEY);
+        if (!hook){
+          alert("Admin regen hook is not set. Go to Settings → Admin Tools and paste your Make webhook URL.");
+          return;
+        }
+
+        const selectedDate = getSelectedDate();
+        if (isThursdayLocal(selectedDate)){
+          alert("Thursday is the trash override. No AI message to regenerate.");
+          return;
+        }
+
+        const ymd = getYMD(selectedDate);
+
+        if (!confirm(`Regenerate the AI message for ${ymd}? This will overwrite today's file.`)) return;
+
+        try{
+          regenBtn.disabled = true;
+          const res = await fetch(hook, {
+            method: "POST",
+            headers: { "Content-Type":"application/json" },
+            body: JSON.stringify({ date: ymd })
+          });
+
+          if (!res.ok){
+            alert("Regen request failed. Check Make scenario + GitHub token.");
+            return;
+          }
+
+          // Give GitHub Actions a moment, then reload message
+          setTimeout(() => loadDailyMessage(getSelectedDate()), 2200);
+        } catch (e){
+          alert("Regen request failed (network).");
+        } finally {
+          regenBtn.disabled = false;
+        }
+      }
+
+      regenBtn.addEventListener("click", regenerateForSelectedDate);
+
+      // ----------------------------
+      // Init
+      // ----------------------------
+      async function init(){
+        setDayNavLinks();
+
+        const selectedDate = getSelectedDate();
+        formatHeaderDate(selectedDate);
+        loadDailyMessage(selectedDate);
+
+        try{
+          choresEl.innerHTML = '<p class="empty-state">Loading chores from the spreadsheet...</p>';
+          const res = await fetch(sheetUrl);
+          const text = await res.text();
+          const allRows = parseSheetResponse(text);
+          const visible = allRows.filter(r => r.dateObj && sameDay(r.dateObj, selectedDate));
+          renderChores(visible);
+        } catch (err){
+          console.error(err);
+          choresEl.innerHTML = '<p class="error-state">Could not load chores from Google Sheets.</p>';
+        }
+      }
+
+      init();
+    })();
+  </script>
 </body>
 </html>
