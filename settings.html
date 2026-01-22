@@ -9,16 +9,12 @@
       --bg:#f5f5f7;
       --card:#ffffff;
       --text:#111;
-      --sub:#6b7280;
+      --sub:#6b6b6f;
       --link:#007aff;
       --radius:18px;
-      --shadow:0 14px 30px rgba(0,0,0,0.06);
+      --shadow:0 14px 30px rgba(0,0,0,.06);
+      --divider:rgba(0,0,0,.08);
     }
-    html[data-theme="classic"]{ --bg:#f5f5f7; --card:#ffffff; --sub:#6b7280; --link:#007aff; color-scheme:light; }
-    html[data-theme="linen"]{ --bg:#f3efe8; --card:#ffffff; --sub:#756a62; --link:#2f6fed; color-scheme:light; }
-    html[data-theme="midnight"]{ --bg:#eef1f6; --card:#ffffff; --sub:#667085; --link:#2b6cb0; color-scheme:light; }
-    html[data-theme="dark"]{ --bg:#0f1115; --card:#171a21; --text:#f2f4f7; --sub:#a8b0bf; --link:#6aa9ff; --shadow:0 14px 30px rgba(0,0,0,0.40); color-scheme:dark; }
-
     body{
       margin:0;
       background:var(--bg);
@@ -26,110 +22,61 @@
       -webkit-font-smoothing:antialiased;
       color:var(--text);
     }
-
-    .wrap{
-      max-width:640px;
-      margin:0 auto;
-      padding:1.25rem 1.2rem 2rem;
-    }
-
+    .wrap{max-width:960px;margin:0 auto;padding:1.25rem 1.5rem 2.5rem;}
     .top{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:1rem;
-      margin-bottom:0.75rem;
+      display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;
+      max-width:640px;
     }
-
-    h1{
-      margin:0;
-      font-size:2.0rem;
-      font-weight:900;
-      letter-spacing:-0.02em;
-      user-select:none;
-    }
-
-    .back{
-      color:var(--link);
-      text-decoration:none;
-      font-weight:800;
-      margin-top:0.45rem;
-    }
-
+    h1{margin:0;font-size:2.05rem;font-weight:750;letter-spacing:-.02em;}
+    .back{margin-top:.35rem;font-weight:650;color:var(--link);text-decoration:none;font-size:1rem;}
+    .back:active{opacity:.7;}
     .card{
-      background:var(--card);
-      border-radius:22px;
-      box-shadow:var(--shadow);
-      padding:0.75rem;
+      max-width:640px;margin-top:1rem;background:var(--card);border-radius:var(--radius);
+      box-shadow:var(--shadow);overflow:hidden;
     }
-
-    .item{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:1rem;
-      padding:0.85rem 0.85rem;
-      border-radius:16px;
-      text-decoration:none;
-      color:inherit;
+    .row{
+      display:flex;align-items:center;justify-content:space-between;gap:1rem;
+      padding:1rem 1.05rem;border-bottom:1px solid var(--divider);
+      text-decoration:none;color:inherit;
     }
-
-    .item:active{ opacity:0.75; }
-
-    .title{
-      font-weight:900;
-      margin:0;
-      font-size:1.02rem;
-    }
-
-    .desc{
-      margin:0.1rem 0 0;
-      font-size:0.95rem;
-      color:var(--sub);
-    }
-
-    .chev{
-      font-size:1.2rem;
-      color:var(--sub);
-    }
-
-    .admin-note{
-      margin-top:0.75rem;
-      font-size:0.85rem;
-      color:var(--sub);
-      text-align:center;
-      user-select:none;
-    }
-
-    .admin-pill{
+    .row:last-child{border-bottom:none;}
+    .left .title{font-weight:750;margin:0 0 .15rem;font-size:1.02rem;}
+    .left .desc{margin:0;color:var(--sub);font-size:.95rem;}
+    .chev{color:rgba(0,0,0,.35);font-size:1.2rem;line-height:1;}
+    .disabled{opacity:.45;cursor:default;}
+    .pill{
+      max-width:640px;margin-top:1rem;text-align:center;
+      color:#0a84ff;font-weight:700;font-size:.95rem;
       display:none;
-      margin-top:0.6rem;
-      text-align:center;
-      font-size:0.9rem;
-      font-weight:800;
-      color:var(--link);
+    }
+    @media (max-width:600px){
+      .wrap{padding:1.1rem 1.2rem 2.1rem;}
+      h1{font-size:1.9rem;}
     }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="top">
-      <h1 id="settingsTitle">Settings</h1>
+      <div>
+        <h1 id="settingsTitle">Settings</h1>
+      </div>
       <a class="back" href="index.html">Back</a>
     </div>
 
-    <div class="card">
-      <a class="item" href="display-theme.html">
-        <div>
+    <div class="card" id="menuCard">
+      <a class="row" href="theme.html">
+        <div class="left">
           <p class="title">Display &amp; Theme</p>
           <p class="desc">Pick a look for the chore chart</p>
         </div>
         <div class="chev">›</div>
       </a>
 
-      <!-- Placeholder for future menu items -->
-      <div class="item" style="opacity:0.45; cursor:default;">
-        <div>
+      <!-- Admin Tools (Dad only) - inserted by JS when enabled -->
+
+      <div class="row disabled" aria-disabled="true">
+        <div class="left">
           <p class="title">Coming soon</p>
           <p class="desc">More settings will live here later</p>
         </div>
@@ -137,40 +84,58 @@
       </div>
     </div>
 
-    <div id="adminPill" class="admin-pill">Admin enabled on this device</div>
-    <div class="admin-note">Tip: (Dad only) Tap “Settings” 7 times to enable admin tools.</div>
+    <div id="adminEnabledPill" class="pill">Admin enabled on this device</div>
   </div>
 
   <script>
     (function(){
-      // apply theme
-      const theme = localStorage.getItem("theme") || "linen";
+      // Apply theme (so Settings matches the app)
+      const theme = localStorage.getItem("theme") || "classic";
       document.documentElement.setAttribute("data-theme", theme);
 
-      // admin enable (device-local)
+      // Hidden admin enable (no tip text on screen)
       const ADMIN_KEY = "admin_enabled";
       const title = document.getElementById("settingsTitle");
-      const pill = document.getElementById("adminPill");
-
-      function refreshAdminPill(){
-        pill.style.display = (localStorage.getItem(ADMIN_KEY)==="1") ? "block" : "none";
-      }
-      refreshAdminPill();
-
-      let taps = 0;
-      let timer = null;
+      let taps = 0, timer = null;
 
       title.addEventListener("click", () => {
         taps++;
         clearTimeout(timer);
-        timer = setTimeout(() => { taps = 0; }, 1200);
+        timer = setTimeout(() => (taps = 0), 1200);
 
-        if (taps >= 7){
+        if (taps >= 7) {
           localStorage.setItem(ADMIN_KEY, "1");
           taps = 0;
-          refreshAdminPill();
+          refreshAdminUI();
         }
       });
+
+      function refreshAdminUI(){
+        const enabled = localStorage.getItem(ADMIN_KEY) === "1";
+        const pill = document.getElementById("adminEnabledPill");
+        const card = document.getElementById("menuCard");
+
+        pill.style.display = enabled ? "block" : "none";
+
+        // Add Admin Tools row if enabled and not already there
+        if (enabled && !document.getElementById("adminToolsRow")) {
+          const a = document.createElement("a");
+          a.className = "row";
+          a.id = "adminToolsRow";
+          a.href = "admin.html";
+          a.innerHTML = `
+            <div class="left">
+              <p class="title">Admin Tools</p>
+              <p class="desc">Regen settings for daily messages</p>
+            </div>
+            <div class="chev">›</div>
+          `;
+          // insert after Display & Theme
+          card.insertBefore(a, card.children[1]);
+        }
+      }
+
+      refreshAdminUI();
     })();
   </script>
 </body>
