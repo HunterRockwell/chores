@@ -4,205 +4,173 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Settings</title>
-
   <style>
-    :root {
-      --bg: #f5f5f7;
-      --card-bg: #ffffff;
-      --text: #111111;
-      --muted: rgba(0,0,0,0.60);
-      --link: #007aff;
-      --border: rgba(0,0,0,0.08);
-      --shadow: 0 14px 30px rgba(0, 0, 0, 0.06);
-      --radius: 18px;
+    :root{
+      --bg:#f5f5f7;
+      --card:#ffffff;
+      --text:#111;
+      --sub:#6b7280;
+      --link:#007aff;
+      --radius:18px;
+      --shadow:0 14px 30px rgba(0,0,0,0.06);
+    }
+    html[data-theme="classic"]{ --bg:#f5f5f7; --card:#ffffff; --sub:#6b7280; --link:#007aff; color-scheme:light; }
+    html[data-theme="linen"]{ --bg:#f3efe8; --card:#ffffff; --sub:#756a62; --link:#2f6fed; color-scheme:light; }
+    html[data-theme="midnight"]{ --bg:#eef1f6; --card:#ffffff; --sub:#667085; --link:#2b6cb0; color-scheme:light; }
+    html[data-theme="dark"]{ --bg:#0f1115; --card:#171a21; --text:#f2f4f7; --sub:#a8b0bf; --link:#6aa9ff; --shadow:0 14px 30px rgba(0,0,0,0.40); color-scheme:dark; }
+
+    body{
+      margin:0;
+      background:var(--bg);
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;
+      -webkit-font-smoothing:antialiased;
+      color:var(--text);
     }
 
-    body {
-      margin: 0;
-      padding: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-      -webkit-font-smoothing: antialiased;
+    .wrap{
+      max-width:640px;
+      margin:0 auto;
+      padding:1.25rem 1.2rem 2rem;
     }
 
-    .wrap {
-      max-width: 760px;
-      margin: 0 auto;
-      padding: 1.25rem 1.25rem 2.5rem;
+    .top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:1rem;
+      margin-bottom:0.75rem;
     }
 
-    .topbar {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 1rem;
-      margin-bottom: 0.75rem;
+    h1{
+      margin:0;
+      font-size:2.0rem;
+      font-weight:900;
+      letter-spacing:-0.02em;
+      user-select:none;
     }
 
-    h1 {
-      margin: 0;
-      font-size: 2.05rem;
-      font-weight: 800;
-      letter-spacing: -0.01em;
+    .back{
+      color:var(--link);
+      text-decoration:none;
+      font-weight:800;
+      margin-top:0.45rem;
     }
 
-    .back {
-      color: var(--link);
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 1.05rem;
+    .card{
+      background:var(--card);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+      padding:0.75rem;
     }
 
-    .panel {
-      background: var(--card-bg);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 1.1rem 1.1rem 1.0rem;
-      border: 1px solid var(--border);
+    .item{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:1rem;
+      padding:0.85rem 0.85rem;
+      border-radius:16px;
+      text-decoration:none;
+      color:inherit;
     }
 
-    .section-title {
-      font-weight: 800;
-      font-size: 1.1rem;
-      margin: 0 0 0.2rem;
+    .item:active{ opacity:0.75; }
+
+    .title{
+      font-weight:900;
+      margin:0;
+      font-size:1.02rem;
     }
 
-    .section-sub {
-      margin: 0 0 1rem;
-      color: var(--muted);
-      font-size: 0.98rem;
-      line-height: 1.25;
+    .desc{
+      margin:0.1rem 0 0;
+      font-size:0.95rem;
+      color:var(--sub);
     }
 
-    .theme-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      margin-top: 0.5rem;
+    .chev{
+      font-size:1.2rem;
+      color:var(--sub);
     }
 
-    .theme-row {
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 0.9rem 0.95rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.9rem;
-      background: rgba(255,255,255,0.65);
+    .admin-note{
+      margin-top:0.75rem;
+      font-size:0.85rem;
+      color:var(--sub);
+      text-align:center;
+      user-select:none;
     }
 
-    .theme-meta {
-      min-width: 0;
-    }
-
-    .theme-name {
-      font-weight: 800;
-      margin: 0;
-      font-size: 1.02rem;
-    }
-
-    .theme-desc {
-      margin: 0.12rem 0 0;
-      color: var(--muted);
-      font-size: 0.95rem;
-      line-height: 1.25;
-    }
-
-    .btn {
-      border: 1px solid rgba(0,0,0,0.18);
-      background: #ffffff;
-      color: #111;
-      padding: 0.35rem 0.85rem;
-      border-radius: 999px;
-      font-weight: 700;
-      cursor: pointer;
-      flex: 0 0 auto;
-    }
-
-    .btn.selected {
-      background: #111;
-      color: #fff;
-      border-color: #111;
-    }
-
-    @media (max-width: 600px) {
-      .wrap { padding: 1.1rem 1.05rem 2.1rem; }
-      h1 { font-size: 1.9rem; }
-      .back { font-size: 1.0rem; }
-      .theme-row { padding: 0.85rem 0.9rem; }
+    .admin-pill{
+      display:none;
+      margin-top:0.6rem;
+      text-align:center;
+      font-size:0.9rem;
+      font-weight:800;
+      color:var(--link);
     }
   </style>
 </head>
-
 <body>
   <div class="wrap">
-    <div class="topbar">
-      <h1>Settings</h1>
-      <a class="back" href="./index.html">Back</a>
+    <div class="top">
+      <h1 id="settingsTitle">Settings</h1>
+      <a class="back" href="index.html">Back</a>
     </div>
 
-    <div class="panel">
-      <div class="section-title">Theme</div>
-      <p class="section-sub">Pick a look. This saves on your device and applies to the chore chart.</p>
+    <div class="card">
+      <a class="item" href="display-theme.html">
+        <div>
+          <p class="title">Display &amp; Theme</p>
+          <p class="desc">Pick a look for the chore chart</p>
+        </div>
+        <div class="chev">›</div>
+      </a>
 
-      <div id="theme-list" class="theme-list"></div>
+      <!-- Placeholder for future menu items -->
+      <div class="item" style="opacity:0.45; cursor:default;">
+        <div>
+          <p class="title">Coming soon</p>
+          <p class="desc">More settings will live here later</p>
+        </div>
+        <div class="chev">›</div>
+      </div>
     </div>
+
+    <div id="adminPill" class="admin-pill">Admin enabled on this device</div>
+    <div class="admin-note">Tip: (Dad only) Tap “Settings” 7 times to enable admin tools.</div>
   </div>
 
   <script>
-    (function () {
-      // Keep this list in sync with index.html THEMES
-      const THEMES = [
-        { key: "classic", name: "Classic iOS", desc: "Clean, neutral, high readability" },
-        { key: "canyon",  name: "Canyon Clay", desc: "Warm, grounded, earthy contrast" },
-        { key: "forest",  name: "Forest Slate", desc: "Cool, refined, dark-green depth" },
-        { key: "dark",    name: "Dark",        desc: "iOS-like dark mode (no neon)" }
-      ];
+    (function(){
+      // apply theme
+      const theme = localStorage.getItem("theme") || "linen";
+      document.documentElement.setAttribute("data-theme", theme);
 
-      const list = document.getElementById("theme-list");
-      const current = (localStorage.getItem("theme") || "classic").toLowerCase();
+      // admin enable (device-local)
+      const ADMIN_KEY = "admin_enabled";
+      const title = document.getElementById("settingsTitle");
+      const pill = document.getElementById("adminPill");
 
-      function render() {
-        list.innerHTML = "";
-
-        THEMES.forEach((t) => {
-          const row = document.createElement("div");
-          row.className = "theme-row";
-
-          const meta = document.createElement("div");
-          meta.className = "theme-meta";
-
-          const name = document.createElement("p");
-          name.className = "theme-name";
-          name.textContent = t.name;
-
-          const desc = document.createElement("p");
-          desc.className = "theme-desc";
-          desc.textContent = t.desc;
-
-          meta.appendChild(name);
-          meta.appendChild(desc);
-
-          const btn = document.createElement("button");
-          btn.className = "btn" + (t.key === current ? " selected" : "");
-          btn.textContent = t.key === current ? "Selected" : "Select";
-
-          btn.addEventListener("click", () => {
-            localStorage.setItem("theme", t.key);
-            // go back to main after selecting
-            window.location.href = "./index.html";
-          });
-
-          row.appendChild(meta);
-          row.appendChild(btn);
-
-          list.appendChild(row);
-        });
+      function refreshAdminPill(){
+        pill.style.display = (localStorage.getItem(ADMIN_KEY)==="1") ? "block" : "none";
       }
+      refreshAdminPill();
 
-      render();
+      let taps = 0;
+      let timer = null;
+
+      title.addEventListener("click", () => {
+        taps++;
+        clearTimeout(timer);
+        timer = setTimeout(() => { taps = 0; }, 1200);
+
+        if (taps >= 7){
+          localStorage.setItem(ADMIN_KEY, "1");
+          taps = 0;
+          refreshAdminPill();
+        }
+      });
     })();
   </script>
 </body>
