@@ -4,601 +4,225 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
-  <!-- PWA manifest & icons -->
-  <link rel="manifest" href="manifest.json" />
-
-  <!-- iOS will use this root-level icon -->
-  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
-  <!-- Extra sizes for other platforms -->
-  <link rel="apple-touch-icon" sizes="192x192" href="icons/forced-labor-icon-192.png" />
-
   <title>Forced Labor</title>
 
   <style>
     :root {
       --bg: #f5f5f7;
       --card-bg: #ffffff;
-      --chip-bg: #f2f2f2;
-      --chip-active-bg: #000000;
-      --chip-text: #007aff;
-      --chip-text-active: #ffffff;
-      --date-text: #666666;
-      --text: #111111;
-      --border-radius-lg: 18px;
-      --shadow-soft: 0 14px 30px rgba(0, 0, 0, 0.06);
-
-      --accent-emmitt: linear-gradient(180deg, #34c759, #0fb163);
-      --accent-turner: linear-gradient(180deg, #0a84ff, #0070f3);
-      --accent-miles: linear-gradient(180deg, #30d1c6, #0fb4a9);
-      --accent-stewart: linear-gradient(180deg, #af52de, #8e44ad);
-
-      --divider: rgba(0, 0, 0, 0.10);
-      --quote-text: rgba(0, 0, 0, 0.72);
+      --text-main: #111;
+      --text-muted: #666;
+      --accent: #007aff;
+      --danger: #cc0000;
+      --radius: 18px;
+      --shadow: 0 14px 30px rgba(0,0,0,0.06);
     }
 
     body {
       margin: 0;
-      padding: 0;
       background: var(--bg);
-      color: var(--text);
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-      -webkit-font-smoothing: antialiased;
+      color: var(--text-main);
     }
 
-    .forced-labor-app {
-      max-width: 960px;
+    .app {
+      max-width: 640px;
       margin: 0 auto;
-      padding: 1.25rem 1.5rem 2.5rem;
-      position: relative;
+      padding: 1.2rem 1.3rem 2.5rem;
     }
 
-    /* Header row: title + hamburger settings */
-    .top-bar {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 1rem;
-    }
-
-    .forced-labor-app h1 {
-      font-size: 2.05rem;
-      margin: 0 0 0.35rem;
+    h1 {
+      font-size: 2rem;
+      margin: 0 0 0.25rem;
       font-weight: 700;
-      letter-spacing: -0.01em;
     }
 
-    /* Hamburger icon: no background box */
-    .settings-link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 40px;
-      height: 40px;
-      margin-top: 0.1rem;
-      color: var(--chip-text);
-      text-decoration: none;
-      border-radius: 10px; /* tap target only */
-      background: transparent;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .settings-link:active { opacity: 0.7; }
-
-    .settings-icon {
-      width: 26px;
-      height: 26px;
-      display: block;
-    }
-
-    /* Date goes above first chore box (kept) */
-    .current-date {
+    .date {
       font-size: 0.95rem;
-      color: var(--date-text);
-      margin: 0 0 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 0.8rem;
     }
 
-    /* Chore cards */
-    .chores-container {
+    .chores {
       display: flex;
       flex-direction: column;
       gap: 0.7rem;
-      max-width: 640px;
-      margin-left: 0;
-      margin-right: auto;
     }
 
-    .chore-card {
-      border-radius: var(--border-radius-lg);
-      padding: 0.9rem 1.1rem;
+    .card {
       background: var(--card-bg);
-      box-shadow: var(--shadow-soft);
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 0.9rem 1.1rem;
     }
 
-    .chore-card::before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 5px;
-      border-radius: var(--border-radius-lg) 0 0 var(--border-radius-lg);
-      background: var(--accent-emmitt);
-    }
-
-    .chore-card.turner::before { background: var(--accent-turner); }
-    .chore-card.miles::before { background: var(--accent-miles); }
-    .chore-card.stewart::before { background: var(--accent-stewart); }
-
-    .chore-content { margin-left: 0.7rem; }
-
-    .chore-kid {
+    .kid {
       font-weight: 650;
-      font-size: 1.02rem;
+      font-size: 1.05rem;
       margin-bottom: 0.2rem;
     }
 
-    .chore-daily,
-    .chore-weekly {
+    .line {
       font-size: 0.97rem;
     }
 
-    .label { font-weight: 700; }
+    .label {
+      font-weight: 700;
+    }
 
-    /* removed: per-card date display */
-
-    .empty-state,
-    .error-state {
+    .nav {
+      margin-top: 1rem;
       font-size: 0.9rem;
-      color: #cc3300;
-      margin-top: 1.5rem;
-      max-width: 640px;
     }
 
-    /* Day nav moved to bottom (below chores, above quote) */
-    .day-nav {
-      margin: 1.0rem 0 0.2rem;
-      text-align: left;
-      max-width: 640px;
-    }
-
-    .day-nav a {
-      font-size: 0.92rem;
-      color: var(--chip-text);
+    .nav a {
+      color: var(--accent);
       text-decoration: none;
       font-weight: 600;
     }
 
-    .day-nav a:hover { text-decoration: underline; }
+    .nav a:hover {
+      text-decoration: underline;
+    }
 
-    /* Daily quote module */
-    .daily-quote-wrap {
-      max-width: 640px;
-      margin-top: 1.0rem;
-      margin-left: 0;
-      margin-right: auto;
+    .message-wrap {
+      margin-top: 1.2rem;
       display: none;
     }
 
-    .daily-quote {
-      background: transparent;
-      box-shadow: none;
-      border-radius: 0;
-      padding: 0.2rem 0 0.6rem;
-      margin: 0;
-    }
-
-    .daily-quote::before {
-      content: "";
-      display: block;
+    .divider {
       height: 1px;
-      background: var(--divider);
-      margin: 0.6rem 0 0.8rem;
+      background: rgba(0,0,0,0.12);
+      margin: 0.8rem 0;
     }
 
-    .daily-quote-title {
-      font-weight: 700;
-      font-size: 0.98rem;
-      margin: 0 0 0.25rem;
+    .message-title {
+      font-weight: 800;
+      font-size: 1.05rem;
+      margin-bottom: 0.2rem;
     }
 
-    .daily-quote-message {
-      margin: 0;
-      font-size: 0.95rem;
-      line-height: 1.35;
-      color: var(--quote-text);
+    .message-text {
       font-style: italic;
+      font-size: 0.96rem;
+      line-height: 1.35;
+      color: rgba(0,0,0,0.75);
     }
 
-    @media (max-width: 600px) {
-      .forced-labor-app { padding: 1.1rem 1.2rem 2.1rem; }
-      .forced-labor-app h1 { font-size: 1.9rem; }
-      .current-date { font-size: 0.9rem; }
-      .chore-card { padding: 0.8rem 1rem; }
-      .chore-kid { font-size: 1rem; }
-      .chore-daily, .chore-weekly { font-size: 0.94rem; }
-      .day-nav a { font-size: 0.88rem; }
-      .daily-quote-title { font-size: 0.95rem; }
-      .daily-quote-message { font-size: 0.92rem; }
+    .trash {
+      color: var(--danger);
+      font-weight: 900;
+      font-size: 1.25rem;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
     }
   </style>
 </head>
 
 <body>
-  <div class="forced-labor-app">
-    <div class="top-bar">
-      <div>
-        <h1>Forced Labor</h1>
-        <!-- Date above first chore box -->
-        <p id="chore-date" class="current-date"></p>
-      </div>
+<div class="app">
+  <h1>Forced Labor</h1>
+  <div id="date" class="date"></div>
 
-      <!-- Hamburger -->
-      <a class="settings-link" href="settings.html" aria-label="Settings">
-        <svg class="settings-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M4 6.5H20" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
-          <path d="M4 12H20" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
-          <path d="M4 17.5H20" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
-        </svg>
-      </a>
-    </div>
+  <div id="chores" class="chores"></div>
 
-    <div id="chores-container" class="chores-container">
-      <p class="empty-state">Loading chores from Google Sheets...</p>
-    </div>
-
-    <!-- Day navigation moved BELOW chores and ABOVE daily message -->
-    <div class="day-nav">
-      <a id="prev-day-link" href="#">← Previous Day</a>
-      <span>&nbsp;|&nbsp;</span>
-      <a id="next-day-link" href="#">Next Day →</a>
-      <span id="back-to-today-wrap" style="display:none;">&nbsp;|&nbsp;
-        <a href="index.html">Back to Today</a>
-      </span>
-    </div>
-
-    <!-- Daily quote/tip -->
-    <div id="daily-quote-wrap" class="daily-quote-wrap">
-      <div id="daily-quote" class="daily-quote"></div>
-    </div>
+  <div class="nav">
+    <a id="prev" href="#">← Previous Day</a>
+    &nbsp;|&nbsp;
+    <a id="next" href="#">Next Day →</a>
+    <span id="todayWrap" style="display:none;">
+      &nbsp;|&nbsp;<a href="index.html">Back to Today</a>
+    </span>
   </div>
 
-  <script>
-    (function () {
-      // ---------------------------
-      // THEMES (must match settings.html)
-      // ---------------------------
-      const THEMES = {
-        classic: {
-          vars: {
-            "--bg": "#f5f5f7",
-            "--card-bg": "#ffffff",
-            "--chip-bg": "#f2f2f2",
-            "--chip-active-bg": "#000000",
-            "--chip-text": "#007aff",
-            "--chip-text-active": "#ffffff",
-            "--date-text": "#666666",
-            "--text": "#111111",
-            "--shadow-soft": "0 14px 30px rgba(0, 0, 0, 0.06)",
-            "--divider": "rgba(0,0,0,0.10)",
-            "--quote-text": "rgba(0,0,0,0.72)",
-            "--accent-emmitt": "linear-gradient(180deg, #34c759, #0fb163)",
-            "--accent-turner": "linear-gradient(180deg, #0a84ff, #0070f3)",
-            "--accent-miles": "linear-gradient(180deg, #30d1c6, #0fb4a9)",
-            "--accent-stewart": "linear-gradient(180deg, #af52de, #8e44ad)"
-          }
-        },
-        canyon: {
-          vars: {
-            "--bg": "#f3efe8",
-            "--card-bg": "#ffffff",
-            "--chip-bg": "#e8dfd1",
-            "--chip-active-bg": "#2b211c",
-            "--chip-text": "#8b4a2b",
-            "--chip-text-active": "#ffffff",
-            "--date-text": "rgba(43,33,28,0.62)",
-            "--text": "#1e1713",
-            "--shadow-soft": "0 14px 30px rgba(43, 33, 28, 0.10)",
-            "--divider": "rgba(43,33,28,0.14)",
-            "--quote-text": "rgba(30,23,19,0.72)",
-            "--accent-emmitt": "linear-gradient(180deg, #7b8f5b, #5e7341)",
-            "--accent-turner": "linear-gradient(180deg, #b26a3c, #8b4a2b)",
-            "--accent-miles": "linear-gradient(180deg, #3f6f73, #2f585c)",
-            "--accent-stewart": "linear-gradient(180deg, #6e4b3a, #4e352a)"
-          }
-        },
-        forest: {
-          vars: {
-            "--bg": "#eef2ef",
-            "--card-bg": "#ffffff",
-            "--chip-bg": "#dde6e0",
-            "--chip-active-bg": "#0f1c16",
-            "--chip-text": "#2e5b4c",
-            "--chip-text-active": "#ffffff",
-            "--date-text": "rgba(15,28,22,0.62)",
-            "--text": "#0f1c16",
-            "--shadow-soft": "0 14px 30px rgba(15, 28, 22, 0.10)",
-            "--divider": "rgba(15,28,22,0.14)",
-            "--quote-text": "rgba(15,28,22,0.72)",
-            "--accent-emmitt": "linear-gradient(180deg, #2e5b4c, #1f4236)",
-            "--accent-turner": "linear-gradient(180deg, #4d6473, #334854)",
-            "--accent-miles": "linear-gradient(180deg, #7a6b4f, #5f533d)",
-            "--accent-stewart": "linear-gradient(180deg, #5b3f46, #3f2b30)"
-          }
-        },
-        dark: {
-          vars: {
-            "--bg": "#0b0b0f",
-            "--card-bg": "#15151c",
-            "--chip-bg": "#232331",
-            "--chip-active-bg": "#ffffff",
-            "--chip-text": "#9cc7ff",
-            "--chip-text-active": "#0b0b0f",
-            "--date-text": "rgba(255,255,255,0.62)",
-            "--text": "#f2f2f4",
-            "--shadow-soft": "0 14px 30px rgba(0, 0, 0, 0.45)",
-            "--divider": "rgba(255,255,255,0.14)",
-            "--quote-text": "rgba(255,255,255,0.72)",
-            "--accent-emmitt": "linear-gradient(180deg, #34c759, #0fb163)",
-            "--accent-turner": "linear-gradient(180deg, #0a84ff, #0070f3)",
-            "--accent-miles": "linear-gradient(180deg, #30d1c6, #0fb4a9)",
-            "--accent-stewart": "linear-gradient(180deg, #af52de, #8e44ad)"
-          }
-        }
-      };
+  <div id="messageWrap" class="message-wrap">
+    <div class="divider"></div>
+    <div id="message"></div>
+  </div>
+</div>
 
-      function applyThemeFromStorage() {
-        const saved = (localStorage.getItem("theme") || "classic").toLowerCase();
-        const themeKey = THEMES[saved] ? saved : "classic";
-        const vars = THEMES[themeKey].vars;
-        Object.keys(vars).forEach((k) => document.documentElement.style.setProperty(k, vars[k]));
-      }
+<script>
+(() => {
+  const SHEET_ID = "1qQEGcKsi5SW6xiZZXkZbV5rY8x7Hs1ImXt8lIXN_uzE";
+  const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
 
-      applyThemeFromStorage();
+  const choresEl = document.getElementById("chores");
+  const dateEl = document.getElementById("date");
+  const messageWrap = document.getElementById("messageWrap");
+  const messageEl = document.getElementById("message");
 
-      // ---------------------------
-      // Data source
-      // ---------------------------
-      const SHEET_ID = "1qQEGcKsi5SW6xiZZXkZbV5rY8x7Hs1ImXt8lIXN_uzE";
-      const SHEET_GID = 0;
+  const params = new URLSearchParams(location.search);
+  const offset = parseInt(params.get("offset") || "0", 10);
 
-      const sheetUrl =
-        "https://docs.google.com/spreadsheets/d/" +
-        SHEET_ID +
-        "/gviz/tq?gid=" +
-        SHEET_GID +
-        "&tqx=out:json";
+  const now = new Date(
+    new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" })
+  );
+  now.setHours(0,0,0,0);
+  now.setDate(now.getDate() + offset);
 
-      const choresContainer = document.getElementById("chores-container");
-      const dateEl = document.getElementById("chore-date");
+  const weekday = now.getDay(); // 4 = Thursday
+  const ymd = now.toISOString().slice(0,10);
 
-      const backToTodayWrap = document.getElementById("back-to-today-wrap");
-      const prevLink = document.getElementById("prev-day-link");
-      const nextLink = document.getElementById("next-day-link");
+  dateEl.textContent = now.toLocaleDateString("en-US", {
+    weekday: "long", month: "short", day: "numeric", year: "numeric"
+  });
 
-      const dailyQuoteWrap = document.getElementById("daily-quote-wrap");
-      const dailyQuoteEl = document.getElementById("daily-quote");
+  document.getElementById("prev").href = `?offset=${offset-1}`;
+  document.getElementById("next").href = `?offset=${offset+1}`;
+  document.getElementById("todayWrap").style.display = offset !== 0 ? "inline" : "none";
 
-      let allRows = [];
-      let visibleChores = [];
+  fetch(URL)
+    .then(r => r.text())
+    .then(txt => {
+      const json = JSON.parse(txt.substring(txt.indexOf("{"), txt.lastIndexOf("}")+1));
+      const rows = json.table.rows || [];
 
-      // ---------------------------
-      // Date helpers
-      // ---------------------------
-      function normalizeDate(d) {
-        const x = new Date(d);
-        x.setHours(0, 0, 0, 0);
-        return x;
-      }
+      rows.forEach(r => {
+        const d = r.c[0]?.v;
+        if (!d) return;
 
-      function getDayOffset() {
-        const params = new URLSearchParams(window.location.search);
-        const raw = params.get("offset");
-        const n = parseInt(raw, 10);
-        return Number.isFinite(n) ? n : 0;
-      }
+        const m = d.match(/Date\((\d+),(\d+),(\d+)\)/);
+        if (!m) return;
 
-      function getSelectedDate() {
-        const offset = getDayOffset();
-        const d = normalizeDate(new Date());
-        d.setDate(d.getDate() + offset);
-        return d;
-      }
+        const rowDate = new Date(m[1], m[2], m[3]);
+        rowDate.setHours(0,0,0,0);
 
-      function formatHeaderDate(selectedDate) {
-        const opts = { weekday: "long", month: "short", day: "numeric", year: "numeric" };
-        dateEl.textContent = selectedDate.toLocaleDateString("en-US", opts);
-      }
+        if (rowDate.getTime() !== now.getTime()) return;
 
-      function sameDay(a, b) {
-        if (!a || !b) return false;
-        return (
-          a.getFullYear() === b.getFullYear() &&
-          a.getMonth() === b.getMonth() &&
-          a.getDate() === b.getDate()
-        );
-      }
-
-      function parseGvizDate(raw) {
-        if (!raw) return null;
-
-        if (raw instanceof Date) return normalizeDate(raw);
-
-        if (typeof raw === "string" && raw.includes("Date(")) {
-          const m = raw.match(/Date\((\d+),(\d+),(\d+)\)/);
-          if (m) {
-            const y = parseInt(m[1], 10);
-            const month = parseInt(m[2], 10);
-            const d = parseInt(m[3], 10);
-            return normalizeDate(new Date(y, month, d));
-          }
-        }
-
-        const maybe = new Date(raw);
-        if (!isNaN(maybe.getTime())) return normalizeDate(maybe);
-
-        return null;
-      }
-
-      function setDayNavLinks() {
-        const offset = getDayOffset();
-        prevLink.href = `index.html?offset=${offset - 1}`;
-        nextLink.href = `index.html?offset=${offset + 1}`;
-        backToTodayWrap.style.display = offset !== 0 ? "inline" : "none";
-      }
-
-      // ---------------------------
-      // Daily quote/tip loader
-      // ---------------------------
-      function getYMD(dateObj) {
-        const y = dateObj.getFullYear();
-        const m = String(dateObj.getMonth() + 1).padStart(2, "0");
-        const d = String(dateObj.getDate()).padStart(2, "0");
-        return `${y}-${m}-${d}`;
-      }
-
-      function emojiForDate(ymd) {
-        const emojis = ["🧽","🧠","💡","😈","🛠️","🧼","⚡","🧯","🪠","🧻"];
-        let hash = 0;
-        for (let i = 0; i < ymd.length; i++) {
-          hash = (hash * 31 + ymd.charCodeAt(i)) >>> 0;
-        }
-        return emojis[hash % emojis.length];
-      }
-
-      function renderDailyQuote(quoteObj, selectedDate) {
-        const ymd = getYMD(selectedDate);
-        const emoji = emojiForDate(ymd);
-
-        const title = quoteObj?.title
-          ? `${emoji} ${quoteObj.title}`
-          : `${emoji} No wisdom today.`;
-
-        const message = quoteObj?.message
-          ? quoteObj.message
-          : "No wisdom today. That is the lesson.";
-
-        dailyQuoteEl.innerHTML = `
-          <div class="daily-quote-title">${title}</div>
-          <p class="daily-quote-message">${message}</p>
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <div class="kid">${r.c[1]?.v}</div>
+          <div class="line"><span class="label">Daily:</span> ${r.c[2]?.v}</div>
+          <div class="line"><span class="label">Weekly:</span> ${r.c[3]?.v}</div>
         `;
+        choresEl.appendChild(card);
+      });
+    });
 
-        dailyQuoteWrap.style.display = "block";
+  // MESSAGE LOGIC
+  messageWrap.style.display = "block";
+
+  if (weekday === 4) {
+    messageEl.innerHTML = `<div class="trash">TAKE TRASH TO ROAD</div>`;
+    return;
+  }
+
+  fetch(`daily/${ymd}.json`, { cache: "no-store" })
+    .then(r => r.ok ? r.json() : null)
+    .then(d => {
+      if (!d) {
+        messageEl.innerHTML = `
+          <div class="message-title">💭 No wisdom today.</div>
+          <div class="message-text">That is the lesson.</div>`;
+        return;
       }
 
-      async function loadDailyQuote(selectedDate) {
-        const ymd = getYMD(selectedDate);
-        const filePath = `daily/${ymd}.json`;
-
-        try {
-          const res = await fetch(filePath, { cache: "no-store" });
-          if (!res.ok) {
-            renderDailyQuote(null, selectedDate);
-            return;
-          }
-          const data = await res.json();
-          renderDailyQuote(data, selectedDate);
-        } catch (e) {
-          renderDailyQuote(null, selectedDate);
-        }
-      }
-
-      // ---------------------------
-      // Sheet parsing
-      // ---------------------------
-      function parseSheetResponse(text) {
-        const jsonText = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
-        const obj = JSON.parse(jsonText);
-        const rows = obj.table.rows || [];
-
-        return rows.map((r) => {
-          const c = r.c || [];
-          const rawDate = c[0]?.v ?? "";
-          const dateObj = parseGvizDate(rawDate);
-
-          return {
-            dateObj,
-            kid: (c[1]?.v ?? "").toString().trim(),
-            dailyChore: (c[2]?.v ?? "").toString().trim(),
-            weeklyChore: (c[3]?.v ?? "").toString().trim(),
-            phone: (c[4]?.v ?? "").toString().trim(),
-            todayFlag: (c[5]?.v ?? "").toString().trim(),
-          };
-        });
-      }
-
-      // ---------------------------
-      // Rendering (NO FILTERS)
-      // ---------------------------
-      function renderChores() {
-        const rows = visibleChores;
-
-        if (!rows.length) {
-          choresContainer.innerHTML =
-            '<p class="empty-state">No chores found for this date. Check that the date exists in the sheet.</p>';
-          return;
-        }
-
-        choresContainer.innerHTML = "";
-
-        rows.forEach((row) => {
-          const card = document.createElement("div");
-          const kidClass = row.kid.toLowerCase();
-          card.className = `chore-card ${kidClass}`;
-
-          card.innerHTML = `
-            <div class="chore-content">
-              <div class="chore-kid">${row.kid}</div>
-              <div class="chore-daily">
-                <span class="label">Daily:</span> ${row.dailyChore || "—"}
-              </div>
-              <div class="chore-weekly">
-                <span class="label">Weekly:</span> ${row.weeklyChore || "—"}
-              </div>
-            </div>
-          `;
-
-          choresContainer.appendChild(card);
-        });
-      }
-
-      function setVisibleChores() {
-        const selectedDate = getSelectedDate();
-        visibleChores = allRows.filter((row) => row.dateObj && sameDay(row.dateObj, selectedDate));
-        renderChores();
-      }
-
-      async function loadChores() {
-        try {
-          choresContainer.innerHTML =
-            '<p class="empty-state">Loading chores from the spreadsheet...</p>';
-
-          const res = await fetch(sheetUrl);
-          const text = await res.text();
-
-          allRows = parseSheetResponse(text);
-          setVisibleChores();
-        } catch (err) {
-          console.error("Error loading sheet:", err);
-          choresContainer.innerHTML =
-            '<p class="error-state">Could not load chores from Google Sheets. Tell Dad to fix it.</p>';
-        }
-      }
-
-      // ---------------------------
-      // Init
-      // ---------------------------
-      setDayNavLinks();
-
-      const selectedDate = getSelectedDate();
-      formatHeaderDate(selectedDate);
-
-      loadDailyQuote(selectedDate);
-      loadChores();
-    })();
-  </script>
+      messageEl.innerHTML = `
+        <div class="message-title">💡 ${d.title}</div>
+        <div class="message-text">${d.message}</div>`;
+    });
+})();
+</script>
 </body>
 </html>
