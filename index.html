@@ -20,6 +20,11 @@
       --border-radius-lg: 18px;
       --shadow-soft: 0 14px 30px rgba(0, 0, 0, 0.06);
       --divider: rgba(0,0,0,0.08);
+
+      /* NEW: subtle name pill + recycle green */
+      --name-pill-bg: color-mix(in srgb, var(--link) 10%, transparent);
+      --name-pill-border: color-mix(in srgb, var(--link) 22%, transparent);
+      --recycle: #1f9d55;
     }
 
     /* Themes */
@@ -34,6 +39,11 @@
     }
     html[data-theme="noir"]{
       --bg:#0f1115; --card-bg:#171a21; --text:#f2f4f8; --sub:#a7adbb; --link:#6aa9ff; --divider:rgba(255,255,255,.10);
+
+      /* make pill readable on dark */
+      --name-pill-bg: rgba(255,255,255,0.06);
+      --name-pill-border: rgba(255,255,255,0.14);
+      --recycle: #44d07a;
     }
 
     body {
@@ -109,14 +119,23 @@
       gap: 0.25rem;
     }
 
+    /* UPDATED: kid name is now a subtle pill */
     .chore-kid {
-      font-weight: 750;
-      font-size: 1.02rem;
-      margin-bottom: 0.2rem;
-
-      /* NEW: make kid name stand out */
-      color: var(--link);
+      font-weight: 800;
+      font-size: 1.08rem; /* slightly bigger */
+      margin-bottom: 0.28rem;
       letter-spacing: 0.01em;
+
+      display: inline-flex;
+      align-self: flex-start;
+      align-items: center;
+
+      color: var(--link);
+      background: var(--name-pill-bg);
+      border: 1px solid var(--name-pill-border);
+      padding: 0.18rem 0.55rem;
+      border-radius: 999px;
+      line-height: 1.2;
     }
 
     .chore-daily, .chore-weekly { font-size: 0.97rem; }
@@ -192,7 +211,23 @@
       white-space: nowrap;
       animation: pulse 1.05s ease-in-out infinite;
       transform-origin: left center;
+      display: inline-block;
     }
+
+    /* NEW: green recycle text with matching pulse */
+    .recycle {
+      color: var(--recycle);
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      font-size: 1.15rem;
+      text-transform: uppercase;
+      white-space: nowrap;
+      animation: pulse 1.05s ease-in-out infinite;
+      transform-origin: left center;
+      display: inline-block;
+      margin-left: 0.5rem;
+    }
+
     @keyframes pulse{
       0%{ transform: scale(1); opacity: 1; }
       50%{ transform: scale(1.06); opacity: .78; }
@@ -225,9 +260,10 @@
       .forced-labor-app h1 { font-size: 1.9rem; }
       .current-date { font-size: 0.9rem; }
       .chore-card { padding: 0.8rem 1rem; }
-      .chore-kid { font-size: 1rem; }
+      .chore-kid { font-size: 1.05rem; }
       .chore-daily, .chore-weekly { font-size: 0.94rem; }
-      .trash { font-size: 1.12rem; }
+      .trash, .recycle { font-size: 1.12rem; }
+      .recycle { margin-left: 0.45rem; }
     }
   </style>
 </head>
@@ -257,6 +293,7 @@
     <!-- Thursday message -->
     <div id="trash-wrap" class="trash-wrap">
       <div id="trash" class="trash">TAKE TRASH TO ROAD</div>
+      <div id="recycle" class="recycle" style="display:none;">AND RECYCLE CAN</div>
     </div>
 
     <!-- Non-Thursday daily quote/tip -->
@@ -300,6 +337,7 @@
       const dailyQuoteEl = document.getElementById("daily-quote");
 
       const trashWrap = document.getElementById("trash-wrap");
+      const recycleEl = document.getElementById("recycle");
 
       const adminFab = document.getElementById("adminFab");
 
@@ -414,6 +452,15 @@
         return selectedDate.getDay() === 4;
       }
 
+      // NEW: every other Thursday starting Feb 19, 2026 shows recycle message
+      function shouldShowRecycle(selectedDate){
+        const anchor = normalizeDate(new Date(2026, 1, 19)); // Feb=1
+        if (!isThursday(selectedDate)) return false;
+        const diffDays = Math.round((normalizeDate(selectedDate) - anchor) / 86400000);
+        // every 14 days from anchor
+        return diffDays % 14 === 0;
+      }
+
       // ---------------------------
       // Sheet parsing + render
       // ---------------------------
@@ -497,7 +544,7 @@
 
         const selectedDate = getSelectedDate();
         if (isThursday(selectedDate)){
-          alert("Thursday uses TAKE TRASH TO ROAD. No regen needed.");
+          alert("Thursday uses TAKE TRASH TO ROAD (and recycle every other Thursday). No regen needed.");
           return;
         }
 
@@ -545,8 +592,13 @@
       if (isThursday(selectedDate)){
         trashWrap.style.display = "block";
         dailyQuoteWrap.style.display = "none";
+
+        // NEW: toggle recycle message every other Thursday starting Feb 19, 2026
+        recycleEl.style.display = shouldShowRecycle(selectedDate) ? "inline-block" : "none";
       } else {
         trashWrap.style.display = "none";
+        dailyQuoteWrap.style.display = "none";
+        recycleEl.style.display = "none";
         loadDailyQuote(selectedDate);
       }
 
