@@ -4,9 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
-  <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
-  <link rel="apple-touch-icon" sizes="192x192" href="icons/forced-labor-icon-192.png" />
+  <link rel="manifest" href="manifest.json?v=2" />
+  <link rel="apple-touch-icon" href="icons/forced-labor-v2-180.png" />
+  <link rel="apple-touch-icon" sizes="192x192" href="icons/forced-labor-v2-192.png" />
 
   <title>Forced Labor</title>
 
@@ -306,9 +306,15 @@
   <button id="adminFab" class="admin-fab" title="Regen message">G</button>
 
   <script>
+    function readTheme() {
+      const saved = localStorage.getItem("theme");
+      const key = saved === "dark" ? "noir" : saved;
+      return ["classic", "linen", "silk", "noir"].includes(key) ? key : "classic";
+    }
+
     (function () {
       // Theme
-      const theme = localStorage.getItem("theme") || "classic";
+      const theme = readTheme();
       document.documentElement.setAttribute("data-theme", theme);
 
       // Settings button
@@ -324,7 +330,7 @@
         SHEET_ID +
         "/gviz/tq?gid=" +
         SHEET_GID +
-        "&tqx=out:json";
+        "&tqx=out:json&tq=" + encodeURIComponent("select A,B,C,D");
 
       const choresContainer = document.getElementById("chores-container");
       const dateEl = document.getElementById("chore-date");
@@ -341,6 +347,12 @@
 
       const adminFab = document.getElementById("adminFab");
 
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, ch => ({
+          "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+        })[ch]);
+      }
+      let lastQuote = null;
       let allRows = [];
       let visibleChores = [];
 
@@ -426,8 +438,8 @@
         const message = quoteObj?.message ? quoteObj.message : "No wisdom today. That is the lesson.";
 
         dailyQuoteEl.innerHTML = `
-          <div class="daily-quote-title">${title}</div>
-          <p class="daily-quote-message">${message}</p>
+          <div class="daily-quote-title">${escapeHtml(title)}</div>
+          <p class="daily-quote-message">${escapeHtml(message)}</p>
         `;
         dailyQuoteWrap.style.display = "block";
       }
@@ -435,11 +447,14 @@
       async function loadDailyQuote(selectedDate) {
         const ymd = getYMD(selectedDate);
         const filePath = `daily/${ymd}.json`;
+        lastQuote = null;
 
         try {
           const res = await fetch(filePath, { cache: "no-store" });
           if (!res.ok) { renderDailyQuote(null, selectedDate); return; }
           const data = await res.json();
+          if (data.date !== ymd || typeof data.message !== "string" || !data.message.trim()) throw new Error("Invalid daily content");
+          lastQuote = data;
           renderDailyQuote(data, selectedDate);
         } catch {
           renderDailyQuote(null, selectedDate);
@@ -467,7 +482,8 @@
       function parseSheetResponse(text) {
         const jsonText = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
         const obj = JSON.parse(jsonText);
-        const rows = obj.table.rows || [];
+        if (obj.status === "error" || !obj.table?.rows) throw new Error("Sheet data unavailable");
+        const rows = obj.table.rows;
 
         return rows.map((r) => {
           const c = r.c || [];
@@ -496,9 +512,9 @@
           const card = document.createElement("div");
           card.className = "chore-card";
           card.innerHTML = `
-            <div class="chore-kid">${row.kid}</div>
-            <div class="chore-daily"><span class="label">Daily:</span> ${row.dailyChore || "—"}</div>
-            <div class="chore-weekly"><span class="label">Weekly:</span> ${row.weeklyChore || "—"}</div>
+            <div class="chore-kid">${escapeHtml(row.kid)}</div>
+            <div class="chore-daily"><span class="label">Daily:</span> ${escapeHtml(row.dailyChore || "—")}</div>
+            <div class="chore-weekly"><span class="label">Weekly:</span> ${escapeHtml(row.weeklyChore || "—")}</div>
           `;
           choresContainer.appendChild(card);
         });
@@ -507,13 +523,27 @@
       function setVisibleChores() {
         const selectedDate = getSelectedDate();
         visibleChores = allRows.filter((row) => row.dateObj && sameDay(row.dateObj, selectedDate));
+        const order = ["Emmitt", "Turner", "Miles", "Stewart"];
+        const seen = new Set();
+        if (visibleChores.some(row => !order.includes(row.kid) || seen.has(row.kid) || !seen.add(row.kid))) {
+          choresContainer.innerHTML = '<p class="error-state">Unexpected or duplicate assignments. Tell Dad to check this date in the sheet.</p>';
+          return;
+        }
+        visibleChores.sort((a,b) => order.indexOf(a.kid) - order.indexOf(b.kid));
         renderChores();
+        if (visibleChores.length && visibleChores.length !== 4) {
+          const warning = document.createElement("p");
+          warning.className = "error-state";
+          warning.textContent = "Some assignments are missing for this date. Tell Dad to check the sheet.";
+          choresContainer.appendChild(warning);
+        }
       }
 
       async function loadChores() {
         try {
           choresContainer.innerHTML = '<p class="empty-state">Loading chores from the spreadsheet...</p>';
-          const res = await fetch(sheetUrl);
+          const res = await fetch(sheetUrl, { cache: "no-store" });
+          if (!res.ok) throw new Error("Sheet request failed");
           const text = await res.text();
           allRows = parseSheetResponse(text);
           setVisibleChores();
@@ -535,6 +565,11 @@
         adminFab.style.display = enabled ? "block" : "none";
       }
 
+      const regenStatus = document.createElement("p");
+      regenStatus.className = "empty-state";
+      regenStatus.setAttribute("role", "status");
+      document.querySelector(".day-nav").after(regenStatus);
+
       async function regenMessageForSelectedDate(){
         const hook = (localStorage.getItem(ADMIN_HOOK_KEY) || "").trim();
         if (!hook) {
@@ -550,6 +585,8 @@
 
         const ymd = getYMD(selectedDate);
 
+        const before = JSON.stringify(lastQuote);
+        regenStatus.textContent = "Requesting a new message…";
         adminFab.disabled = true;
         adminFab.textContent = "…";
 
@@ -557,24 +594,32 @@
           const resp = await fetch(hook, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ymd })
+            body: JSON.stringify({ ymd }),
+            signal: AbortSignal.timeout(15000)
           });
 
           if (!resp.ok) throw new Error("Webhook failed");
 
-          // Give GitHub a moment, then reload the daily JSON
-          setTimeout(() => {
-            dailyQuoteWrap.style.display = "none";
-            loadDailyQuote(selectedDate);
-          }, 1200);
-
+          regenStatus.textContent = "Request accepted. Waiting for the published message…";
+          const deadline = Date.now() + 120000;
+          while (Date.now() < deadline) {
+            await new Promise(resolve => setTimeout(resolve, 5000));
+            const res = await fetch(`daily/${ymd}.json?refresh=${Date.now()}`, { cache: "no-store", signal: AbortSignal.timeout(10000) });
+            if (!res.ok) continue;
+            const data = await res.json();
+            if (data.date !== ymd || typeof data.message !== "string" || !data.message.trim()) continue;
+            if (JSON.stringify(data) === before) continue;
+            lastQuote = data;
+            renderDailyQuote(data, selectedDate);
+            regenStatus.textContent = "New message published.";
+            return;
+          }
+          regenStatus.textContent = "No new published message found yet. Check the generation workflow and deployment.";
         } catch (e) {
-          alert("Regen failed. Check your Make scenario + webhook URL.");
+          regenStatus.textContent = "Could not verify a new message. Check the webhook, workflow and deployment.";
         } finally {
-          setTimeout(() => {
-            adminFab.disabled = false;
-            adminFab.textContent = "G";
-          }, 800);
+          adminFab.disabled = false;
+          adminFab.textContent = "G";
         }
       }
 
@@ -604,6 +649,13 @@
 
       refreshAdminFab();
       loadChores();
+      const openedOn = getYMD(new Date());
+      function refreshIfNewDay() {
+        if (getYMD(new Date()) !== openedOn && !adminFab.disabled) location.reload();
+      }
+      document.addEventListener("visibilitychange", () => { if (!document.hidden) refreshIfNewDay(); });
+      window.addEventListener("pageshow", refreshIfNewDay);
+      setInterval(refreshIfNewDay, 60000);
     })();
   </script>
 </body>

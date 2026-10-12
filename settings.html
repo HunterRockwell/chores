@@ -88,9 +88,15 @@
   </div>
 
   <script>
+    function readTheme() {
+      const saved = localStorage.getItem("theme");
+      const key = saved === "dark" ? "noir" : saved;
+      return ["classic", "linen", "silk", "noir"].includes(key) ? key : "classic";
+    }
+
     (function(){
       // Apply theme (so Settings matches the app)
-      const theme = localStorage.getItem("theme") || "classic";
+      const theme = readTheme();
       document.documentElement.setAttribute("data-theme", theme);
 
       // Hidden admin enable (no tip text on screen)

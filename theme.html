@@ -77,6 +77,12 @@
   </div>
 
   <script>
+    function readTheme() {
+      const saved = localStorage.getItem("theme");
+      const key = saved === "dark" ? "noir" : saved;
+      return ["classic", "linen", "silk", "noir"].includes(key) ? key : "classic";
+    }
+
     (function(){
       const THEMES = [
         { key:"classic", name:"Classic iOS", desc:"Clean, neutral, high readability" },
@@ -92,7 +98,7 @@
       }
 
       function render(){
-        const current = localStorage.getItem("theme") || "classic";
+        const current = readTheme();
         applyTheme(current);
 
         list.innerHTML = "";
