@@ -2,11 +2,22 @@ name: Daily Quote Generator
 
 on:
   schedule:
-    - cron: "0 * * * *" # runs hourly (UTC). Script only generates at midnight America/Los_Angeles.
+    - cron: "0 * * * *" # Hourly catch-up; generator skips existing Pacific-date files.
   workflow_dispatch:
+    inputs:
+      date:
+        description: "Selected date (YYYY-MM-DD); blank uses today in Pacific time"
+        required: false
+        type: string
+      regenerate:
+        description: "Replace existing non-Thursday content"
+        default: false
+        type: boolean
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 concurrency:
   group: daily-quote
@@ -14,6 +25,8 @@ concurrency:
 
 jobs:
   generate:
+    outputs:
+      changed: ${{ steps.commit.outputs.changed }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,17 +39,27 @@ jobs:
 
       - name: Generate daily message
         env:
+          TARGET_DATE: ${{ inputs.date }}
+          REGENERATE: ${{ inputs.regenerate }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: node .github/scripts/generate-daily-quote.mjs
 
       - name: Commit & push if changed
+        id: commit
         run: |
-          if git status --porcelain | grep .; then
+          git add daily/*.json
+          if ! git diff --cached --quiet; then
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add daily/*.json
             git commit -m "Add daily message"
             git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
           else
             echo "No changes to commit."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
           fi
+
+  publish:
+    needs: generate
+    if: needs.generate.outputs.changed == 'true'
+    uses: ./.github/workflows/pages.yml
