@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { main, laNowParts, validateDate, extractOutputText } from '../.github/scripts/generate-daily-quote.mjs';
-const response = {status:'completed', output:[{type:'reasoning'}, {type:'message',content:[{type:'output_text',text:'Title: Dad says\nMessage: Clean first. Complain with a spotless floor.'}]}]};
+const response = {status:'completed', output:[{type:'reasoning'}, {type:'message',content:[{type:'output_text',text:JSON.stringify({title:'Dad says',message:'Clean first. Complain with a spotless floor.'})}]}]};
 const mockFetch = async () => ({ok:true,json:async()=>response});
 function temp(t) { const dir=fs.mkdtempSync(path.join(os.tmpdir(),'chores-')); t.after(()=>fs.rmSync(dir,{recursive:true})); return dir; }
 test('raw Responses output is parsed and incomplete/refused output rejected',()=>{
@@ -27,7 +27,7 @@ test('manual generation outside midnight, idempotence and explicit regeneration'
  assert.equal(JSON.parse(before).date,'2026-10-12');
  await main({env,now,dailyDir,fetchFn:()=>{throw Error('must skip');}});
  assert.equal(fs.readFileSync(file,'utf8'),before);
- await main({env:{...env,REGENERATE:'true'},now,dailyDir,fetchFn:async()=>({ok:true,json:async()=>({...response,output:[{type:'message',content:[{type:'output_text',text:'Title: New\nMessage: New wisdom.'}]}]})})});
+ await main({env:{...env,REGENERATE:'true'},now,dailyDir,fetchFn:async()=>({ok:true,json:async()=>({...response,output:[{type:'message',content:[{type:'output_text',text:JSON.stringify({title:'New',message:'New wisdom.'})}]}]})})});
  assert.equal(JSON.parse(fs.readFileSync(file)).message,'New wisdom.');
 });
 test('Thursday recycling matches February anchor and crosses DST',async t=>{
