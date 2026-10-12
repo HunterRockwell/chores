@@ -572,11 +572,6 @@
 
       async function regenMessageForSelectedDate(){
         const hook = (localStorage.getItem(ADMIN_HOOK_KEY) || "").trim();
-        if (!hook) {
-          alert("Admin regen hook is not set. Go to Settings → Admin Tools and paste your Make webhook URL.");
-          return;
-        }
-
         const selectedDate = getSelectedDate();
         if (isThursday(selectedDate)){
           alert("Thursday uses TAKE TRASH TO ROAD (and recycle every other Thursday). No regen needed.");
@@ -591,6 +586,7 @@
         adminFab.textContent = "…";
 
         try {
+          if (hook) {
           const resp = await fetch(hook, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -601,7 +597,19 @@
           if (!resp.ok) throw new Error("Webhook failed");
 
           regenStatus.textContent = "Request accepted. Waiting for the published message…";
-          const deadline = Date.now() + 120000;
+          } else {
+            const workflow = "https://github.com/HunterRockwell/chores/actions/workflows/daily-quote.yml";
+            const opened = window.open(workflow, "_blank");
+            if (opened) opened.opener = null;
+            regenStatus.textContent = `In GitHub, choose Run workflow, enter ${ymd}, check Replace existing non-Thursday content, then Run workflow. Return here to see the published replacement.`;
+            const link = document.createElement("a");
+            link.href = workflow;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            link.textContent = " Open GitHub";
+            regenStatus.appendChild(link);
+          }
+          const deadline = Date.now() + 300000;
           while (Date.now() < deadline) {
             await new Promise(resolve => setTimeout(resolve, 5000));
             const res = await fetch(`daily/${ymd}.json?refresh=${Date.now()}`, { cache: "no-store", signal: AbortSignal.timeout(10000) });
