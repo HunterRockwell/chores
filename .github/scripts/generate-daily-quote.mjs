@@ -78,7 +78,9 @@ async function callOpenAI({ apiKey, prompt, fetchFn = fetch }) {
           content: prompt,
         },
       ],
-      text: { format: { type: "text" } },
+      text: { format: { type: "json_schema", name: "daily_message", strict: true,
+        schema: { type: "object", properties: { title: { type: "string" }, message: { type: "string" } },
+          required: ["title", "message"], additionalProperties: false } } },
     }),
   });
 
@@ -89,25 +91,11 @@ async function callOpenAI({ apiKey, prompt, fetchFn = fetch }) {
   const json = await res.json();
   const text = extractOutputText(json);
 
-  // Expect: Title: ...\nMessage: ...
-  // But tolerate minor variance.
-  let title = "";
-  let message = "";
-
-  const titleMatch = text.match(/title\s*:\s*(.+)/i);
-  const msgMatch = text.match(/message\s*:\s*([\s\S]+)/i);
-
-  if (titleMatch) title = titleMatch[1].trim();
-  if (msgMatch) message = msgMatch[1].trim();
-
-  // Fallback if formatting differs
-  if (!title || !message) {
-    const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
-    title = lines[0]?.replace(/^[-*]\s*/, "")?.slice(0, 80) || "Daily Note";
-    message = lines.slice(1).join(" ").trim() || text;
-  }
-
-  if (title.length > 100 || message.length > 800) throw new Error("Daily message exceeds length limits");
+  const result = JSON.parse(text);
+  if (typeof result.title !== "string" || typeof result.message !== "string") throw new Error("Invalid daily message");
+  const title = result.title.trim();
+  const message = result.message.trim();
+  if (!title || !message || title.length > 100 || message.length > 800) throw new Error("Invalid daily message length");
   return { title, message };
 }
 
@@ -146,9 +134,7 @@ export async function main({ env = process.env, now = new Date(), dailyDir = DAI
   const category = categories[Math.floor(date.getTime() / 86400000) % categories.length];
   const prompt =
     `Write ONE daily message for ${ymd}.\n` +
-    `Output exactly two lines:\n` +
-    `Title: <short title>\n` +
-    `Message: <1–2 sentences>\n` +
+    `Return a plain-text short title and a 1–2 sentence message in the required JSON format. No markdown or category labels.\n` +
     `Category: ${category}. Witty, edgy and/or inspiring. Keep it kid-safe. No profanity. No politics. Fun facts must be accurate.`;
 
   const { title, message } = await callOpenAI({ apiKey, prompt, fetchFn });
