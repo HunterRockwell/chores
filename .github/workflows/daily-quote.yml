@@ -37,21 +37,27 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Verify content logic
+        run: node --test tests/*.test.mjs
+
       - name: Generate daily message
         env:
           TARGET_DATE: ${{ inputs.date }}
           REGENERATE: ${{ inputs.regenerate }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: node .github/scripts/generate-daily-quote.mjs
+
+      - name: Refresh Alabama schedule and available odds
+        continue-on-error: true # Keep last good football cache; message publication may continue.
+        run: node .github/scripts/update-football.mjs
 
       - name: Commit & push if changed
         id: commit
         run: |
-          git add daily/*.json
+          git add daily/*.json family/football.json
           if ! git diff --cached --quiet; then
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            git commit -m "Add daily message"
+            git commit -m "Refresh family message and Alabama schedule"
             git push
             echo "changed=true" >> "$GITHUB_OUTPUT"
           else

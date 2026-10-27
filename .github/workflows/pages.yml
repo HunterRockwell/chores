@@ -35,7 +35,7 @@ jobs:
         run: |
           mkdir _site
           cp *.html manifest.json *.png _site/
-          cp -R icons daily _site/
+          cp -R icons daily family _site/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

@@ -1,0 +1,48 @@
+name: Install approved family edition
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: daily-quote
+  cancel-in-progress: false
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Verify and unpack approved release
+        run: |
+          python3 - <<'PYTHON'
+          import hashlib, zipfile
+          from pathlib import Path
+          archive=Path('family-release.zip')
+          assert hashlib.sha256(archive.read_bytes()).hexdigest() == '25061e3ebb399611cd8c842391c013466a492ae667ad8d85769f2b9c4c203056', 'Release checksum mismatch'
+          allowed=['.github/scripts/generate-daily-quote.mjs', '.github/scripts/update-football.mjs', '.github/workflows/daily-quote.yml', '.github/workflows/pages.yml', 'README.md', 'daily/2026-10-27.json', 'family/content.json', 'family/football.json', 'family/footer.js', 'icons/forced-labor-v3-180.png', 'icons/forced-labor-v3-192.png', 'icons/forced-labor-v3-512.png', 'index.html', 'manifest.json', 'tests/family.test.mjs', 'tests/frontend.test.mjs', 'tests/generator.test.mjs']
+          with zipfile.ZipFile(archive) as z:
+              assert set(z.namelist()) == set(allowed), 'Unexpected release paths'
+              for name in z.namelist():
+                  assert not name.startswith('/') and '..' not in Path(name).parts
+              for name in z.namelist():
+                  if name.startswith('.github/workflows/'):
+                      assert Path(name).read_bytes() == z.read(name), 'Workflow must be installed through owner UI first'
+              z.extractall('.')
+          PYTHON
+      - name: Verify complete app
+        run: node --test tests/*.test.mjs
+      - name: Publish approved source atomically
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md index.html manifest.json daily family icons tests .github/scripts .github/workflows
+          git rm family-release.zip
+          git commit -m "Install sourced Saban family footer, Alabama game cards and supplied Home Screen icon"
+          git push
+      - name: Dispatch verified Pages deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --ref main
