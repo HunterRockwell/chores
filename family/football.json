@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-27T15:16:54.571Z",
+  "updated_at": "2026-10-27T19:15:37.178Z",
   "provider": "ESPN public schedule and game summary; best-effort availability",
   "games": [
     {
@@ -179,7 +179,7 @@
       "state": "AL",
       "status": "post",
       "snapshot_date": "2026-10-27",
-      "odds_as_of": "2026-10-27T15:16:54.571Z",
+      "odds_as_of": "2026-10-27T19:15:37.178Z",
       "odds_provider": "DraftKings",
       "odds_spread": "ALA -13.5",
       "odds_total": 49.5,
