@@ -12,7 +12,7 @@ export async function main({env=process.env,now=new Date(),dailyDir=path.join(pr
  const garbage=family.trash(ymd);
  if(garbage.show&&regenerate)throw Error('Thursday content cannot be regenerated');
  if(before?.family_version===content.version&&!regenerate){console.log('Already current: '+ymd);return;}
- const revision=regenerate&&before?.family_version===content.version?(Number(before.revision)||0)+1:0;
+ const revision=regenerate?(before?.family_version===content.version?(Number(before.revision)||0)+1:1):0;
  const selected=family.messageFor(content,ymd,revision);
  const record=garbage.show?{date:ymd,type:'trash',title:'',message:'TAKE TRASH TO ROAD'+(garbage.recycle?' AND RECYCLE CAN':'')}:{date:ymd,type:'normal',category:'saban',source_message_id:selected.id,title:selected.title,message:selected.body,attribution:selected.display_attribution,source_id:selected.source_id,revision};
  fs.mkdirSync(dailyDir,{recursive:true});fs.writeFileSync(file,JSON.stringify({...record,family_version:content.version,generated_at:now.toISOString()},null,2)+'\n');console.log('Wrote daily/'+ymd+'.json');
