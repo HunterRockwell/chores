@@ -4,9 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
-  <link rel="manifest" href="manifest.json?v=2" />
-  <link rel="apple-touch-icon" href="icons/forced-labor-v2-180.png" />
-  <link rel="apple-touch-icon" sizes="192x192" href="icons/forced-labor-v2-192.png" />
+  <link rel="manifest" href="manifest.json?v=3" />
+  <link rel="apple-touch-icon" href="icons/forced-labor-v3-180.png" />
+  <link rel="apple-touch-icon" sizes="192x192" href="icons/forced-labor-v3-192.png" />
 
   <title>Forced Labor</title>
 
@@ -267,6 +267,26 @@
       .trash, .recycle { font-size: 1.12rem; }
       .recycle { margin-left: 0.45rem; }
     }
+
+    /* Family-only footer: the garbage header survives every content override. */
+    #trash-line{text-align:center;white-space:nowrap}
+    #trash-text{display:inline-block;font-size:18.4px;animation:pulse 1.05s ease-in-out infinite;transform-origin:center}
+    #trash-text .trash,#trash-text .recycle{font-size:inherit;animation:none;margin:0;transform:none}
+    .daily-quote-wrap,.trash-wrap{width:100%}
+    .family-credit{font-size:.68rem;line-height:1.4;color:var(--sub);margin:.4rem 0 0}
+    .family-credit a{color:inherit}
+    .family-game{text-align:center;padding:12px;border-radius:14px;background:var(--card-bg);border:1px solid var(--divider)}
+    .family-kicker{font-size:.7rem;font-weight:850;letter-spacing:.08em;color:#a51c30}
+    .family-logos{display:flex;align-items:center;justify-content:center;gap:18px;margin:12px 0}
+    .family-logos img{width:56px;height:56px;object-fit:contain}
+    .family-game h3{font-size:1.05rem;line-height:1.35;margin:.4rem 0}
+    .family-game p{font-size:.8rem;line-height:1.4;margin:.45rem 0}
+    .family-game .family-credit{font-size:.68rem}
+    .family-photo{max-width:594px;margin:auto;text-align:center}
+    #saban-embed{max-width:100%;overflow:visible}#saban-embed>div,#saban-embed iframe{max-width:100%}
+    .family-photo-fallback{font-size:.7rem;color:var(--sub);margin-top:8px}
+    .family-photo-fallback img{display:block;width:100%;height:210px;object-fit:contain;margin-top:8px}
+    @media(prefers-reduced-motion:reduce){#trash-text,.trash,.recycle{animation:none}}
   </style>
 </head>
 <body>
@@ -294,8 +314,7 @@
 
     <!-- Thursday message -->
     <div id="trash-wrap" class="trash-wrap">
-      <div id="trash" class="trash">TAKE TRASH TO ROAD</div>
-      <div id="recycle" class="recycle" style="display:none;">AND RECYCLE CAN</div>
+      <div id="trash-line"><span id="trash-text"><span id="trash" class="trash">TAKE TRASH TO ROAD</span> <span id="recycle" class="recycle" style="display:none;">AND RECYCLE CAN</span></span></div>
     </div>
 
     <!-- Non-Thursday daily quote/tip -->
@@ -307,6 +326,7 @@
   <!-- Dad-only regen button -->
   <button id="adminFab" class="admin-fab" title="Regen message">G</button>
 
+  <script src="family/footer.js?v=20261027"></script>
   <script>
     function readTheme() {
       const saved = localStorage.getItem("theme");
@@ -376,7 +396,8 @@
 
       function getSelectedDate() {
         const offset = getDayOffset();
-        const d = normalizeDate(new Date());
+        const [year,month,day] = FamilyFooter.dateKey().split("-").map(Number);
+        const d = normalizeDate(new Date(year,month-1,day));
         d.setDate(d.getDate() + offset);
         return d;
       }
@@ -447,20 +468,14 @@
       }
 
       async function loadDailyQuote(selectedDate) {
-        const ymd = getYMD(selectedDate);
-        const filePath = `daily/${ymd}.json`;
-        lastQuote = null;
-
         try {
-          const res = await fetch(filePath, { cache: "no-store" });
-          if (!res.ok) { renderDailyQuote(null, selectedDate); return; }
-          const data = await res.json();
-          if (data.date !== ymd || typeof data.message !== "string" || !data.message.trim()) throw new Error("Invalid daily content");
-          lastQuote = data;
-          renderDailyQuote(data, selectedDate);
-        } catch {
-          renderDailyQuote(null, selectedDate);
+          const response = await fetch(`daily/${getYMD(selectedDate)}.json`, {cache:"no-store"});
+          lastQuote = response.ok ? await response.json() : null;
+          if(lastQuote?.date !== getYMD(selectedDate)) lastQuote = null;
+          await FamilyFooter.render(getYMD(selectedDate), lastQuote);
         }
+        catch { renderDailyQuote({title:"Coach's library is unavailable",message:"Please refresh to load the family messages."},selectedDate); }
+        FamilyFooter.fitTrash();
       }
 
       // Thursday logic (local device time; your generator runs PT)
@@ -573,6 +588,7 @@
       document.querySelector(".day-nav").after(regenStatus);
 
       async function regenMessageForSelectedDate(){
+        if (!dailyQuoteEl.dataset.familyKind) { regenStatus.textContent = "Wait for the family footer to finish loading, then try again."; return; }
         const hook = (localStorage.getItem(ADMIN_HOOK_KEY) || "").trim();
         const selectedDate = getSelectedDate();
         if (isThursday(selectedDate)){
@@ -581,7 +597,7 @@
         }
 
         const ymd = getYMD(selectedDate);
-
+        if (dailyQuoteEl.dataset.familyKind === "game") { alert("Game-day details update from the schedule; message regeneration cannot replace them."); return; }
         const before = JSON.stringify(lastQuote);
         regenStatus.textContent = "Requesting a new message…";
         adminFab.disabled = true;
@@ -620,7 +636,7 @@
             if (data.date !== ymd || typeof data.message !== "string" || !data.message.trim()) continue;
             if (JSON.stringify(data) === before) continue;
             lastQuote = data;
-            renderDailyQuote(data, selectedDate);
+            await FamilyFooter.render(ymd, data);
             regenStatus.textContent = "New message published.";
             return;
           }
@@ -643,25 +659,18 @@
       const selectedDate = getSelectedDate();
       formatHeaderDate(selectedDate);
 
-      // Show Thursday message OR daily quote
-      if (isThursday(selectedDate)){
-        trashWrap.style.display = "block";
-        dailyQuoteWrap.style.display = "none";
-
-        // NEW: toggle recycle message every other Thursday starting Feb 19, 2026
-        recycleEl.style.display = shouldShowRecycle(selectedDate) ? "inline-block" : "none";
-      } else {
-        trashWrap.style.display = "none";
-        dailyQuoteWrap.style.display = "none";
-        recycleEl.style.display = "none";
-        loadDailyQuote(selectedDate);
-      }
+      // Garbage header is independent of the game/message/photo beneath it.
+      trashWrap.style.display = isThursday(selectedDate) ? "block" : "none";
+      recycleEl.style.display = shouldShowRecycle(selectedDate) ? "inline" : "none";
+      loadDailyQuote(selectedDate);
+      window.addEventListener("resize", FamilyFooter.fitTrash);
+      document.fonts?.ready.then(FamilyFooter.fitTrash);
 
       refreshAdminFab();
       loadChores();
-      const openedOn = getYMD(new Date());
+      const openedOn = FamilyFooter.dateKey();
       function refreshIfNewDay() {
-        if (getYMD(new Date()) !== openedOn && !adminFab.disabled) location.reload();
+        if (FamilyFooter.dateKey() !== openedOn && !adminFab.disabled) location.reload();
       }
       document.addEventListener("visibilitychange", () => { if (!document.hidden) refreshIfNewDay(); });
       window.addEventListener("pageshow", refreshIfNewDay);

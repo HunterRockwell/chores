@@ -1,41 +1,27 @@
-# Forced Labor
+# Forced Labor — family edition
 
-Existing family chore web app: static HTML/JavaScript, Google Sheets assignments, and shared `daily/YYYY-MM-DD.json` content. Production repository: HunterRockwell/chores; Pages path: `/chores/`.
+Static HTML/JavaScript on GitHub Pages; Google Sheets A–D supplies dated chore assignments. Add future dates to the existing Sheet at any time. Footer content does not depend on assignment coverage.
 
-## Local development
+## Sourced family footer
 
-Serve this directory with `python3 -m http.server 8765 --bind 127.0.0.1`.
-Run fixture tests with `node --test tests/*.test.mjs` (Node 20+). No npm dependencies or build step.
+`family/content.json` installs 70 short sourced messages and 52 weekly official Getty photo embeds, plus eight separately credited public-domain alternatives. Quotes, paraphrases and reported moments are distinguished. Content is for this family edition; remove/replace `family/`, its script and footer integration before App Store distribution. No raw Getty preview downloads are published.
 
-## Shared content
+Daily selection is deterministic in America/Los_Angeles and works even without a dated JSON record. The hourly Daily Quote Generator writes the same sourced selection to `daily/YYYY-MM-DD.json`; regeneration advances within the approved library without AI calls or API keys. Old AI jokes do not override the new library. G retains the GitHub-authenticated workflow form and waits for a changed published same-date record. Thursdays cannot be regenerated.
 
-GitHub Actions owns generation. Hourly scheduled runs use the current America/Los_Angeles calendar date and skip existing files, allowing catch-up after a delayed midnight run. This retains the current civil Pacific timezone behavior, including DST; fixed UTC-8 was historically ambiguous and has not been selected anew.
+Thursday trash text remains visible independently of game/photo content. Recycling alternates from February 19, 2026. Both trash/recycle spans stay on one centered line, shrinking equally only when necessary. Getty's official viewer retains its provider credit/caption and has a public-domain alternate control if it cannot load.
 
-Manual workflow inputs: `date` (YYYY-MM-DD, optional) and `regenerate` (boolean). Manual runs may generate outside midnight and replace only the selected non-Thursday date. Thursday generation includes recycling every fourteen days from 2026-02-19; Thursday regeneration fails. Non-Thursday content rotates dad joke, inspiration and fun fact categories. API output is read from Responses `output[].content[]` text items and validated as structured title/message JSON. Failed/missing API credentials fail the run without replacing existing content. Credentials belong only in the Actions secret `OPENAI_API_KEY`.
+`family/football.json` caches Alabama games and team logo references. `.github/scripts/update-football.mjs` refreshes regular and postseason entries for the current and next season using ESPN public schedule/summary feeds on the existing hourly workflow. Actual Alabama fixtures, including weekday bowls/playoffs, activate game cards; playoff calendar dates alone do not. Exact unconfirmed times remain TBA. A Thursday game replaces only the photo, keeping the garbage header above it. Odds are best-effort, labeled with provider/time and hidden when older than two hours or after kickoff; absent lines display unavailable. No paid service/account is configured. Failed updates retain the last good cache and log a workflow warning. Schedule-only updates also trigger explicit Pages publication.
 
-The G button opens GitHub's authenticated workflow controls when no Make webhook is saved. Choose Run workflow, enter the date shown by the app, check replacement, and run. Return to the app; it polls for up to five minutes and reports success only after changed same-date JSON is published. This requires signing into GitHub as a repository writer. It is a working route through GitHub, with an extra confirmation form; a direct one-tap backend is not configured.
+## Development and deployment
 
-Optional existing Make webhook support remains. Its server-side action must dispatch this workflow with `date=ymd` and `regenerate=true`; keep write tokens server-side. HTTP OK means accepted, not published. Polling cannot identify a particular run if multiple people regenerate at once. A run-ID/version endpoint remains a future improvement. The historical Make configuration has not been recovered.
+Node 20+: `node --test tests/*.test.mjs`. Serve locally with `python3 -m http.server 8767 --bind 127.0.0.1`. No dependencies/build step. `pages.yml` stages public HTML/manifest/PNGs plus icons, daily and family directories. Research notes, raw source pages, recipients and secrets are never staged.
 
-## Sheet contract and privacy
+Pages uses GitHub Actions. Hourly updates run in GitHub, not on an iMac. Manual workflow date/regenerate inputs retain the existing controls; GitHub can suspend inactive scheduled workflows after 60 days. Do not interpret one manual success as proof of future unattended execution.
 
-Keep existing gid 0 dated rows: A Date, B Kid, C Daily Chore, D Weekly Chore. The app requests A-D only, preserves Emmitt/Turner/Miles/Stewart order, and flags duplicate/unexpected or missing assignments. Restricting the query reduces browser data retrieval; it does not protect other columns in a publicly readable Sheet. Sharing settings and a separate contact-free public feed still need review before distribution changes. Never commit phone numbers, recipients, webhook URLs or API keys.
+## Home Screen icon
 
-## Update behavior
+The v3 180/192/512px icons are resized directly from Jason's supplied `FL logo.png`; new filenames prevent reusing the v2 asset URLs. Existing iPhone Home Screen shortcuts may need to be re-added from Safari. Actual iPhone cache/update behavior must be checked on-device.
 
-No service worker exists. Refresh checks on return to the foreground and every minute reload the page when the local calendar date changes. This refreshes assignments for the new day; it does not prove a stale Home Screen installation receives new HTML. Preserve local preferences during real-device testing. Old `dark` maps to `noir`; unsupported themes fall back to Classic.
+## Assignments and boundaries
 
-## Publication and icon
-
-Pages uses GitHub Actions as its source. `pages.yml` verifies the app and stages only public HTML, manifest, PNGs, icons and dated content. Daily generation explicitly calls the same publishing workflow after a content commit; bot commits alone do not trigger a branch-based Pages build. The inactivity-disabled daily workflow was re-enabled on October 11, 2026. GitHub can disable inactive scheduled workflows again after 60 days; do not assume schedules continue indefinitely without verification.
-
-The dynamic black/gold v2 icon is available in 180, 192, 512 and 1024 sizes. HTML and manifest use the new filenames to avoid reusing cached asset URLs. Existing iPhone Home Screen icons may still need re-adding from Safari; real-device icon refresh remains untested. Preserve saved theme/admin preferences when troubleshooting.
-
-## Remaining integration checks
-
-1. Jason authorized deployment and live generation/regeneration verification on October 11, 2026.
-2. Keep actual scheduled and real-phone outcomes distinct from manually verified generation/publication.
-3. Test installation/update on an actual iPhone.
-4. Recover the chosen home M1 iMac/BlueBubbles configuration with Jason. Build/test a dry-run sender using the existing A-D rows and published daily JSON, then add per-recipient idempotence before a separately authorized delivery test and 6 AM activation. Do not assume this Mac is that server.
-
-The authorized release deploys app/content/icon fixes. No reminder messages, Make mutation, Sheet edit or iMac schedule activation were performed.
+Sheet gid 0: A Date, B Kid, C Daily Chore, D Weekly Chore. Only A–D is queried; assignments retain Emmitt/Turner/Miles/Stewart order and flag duplicates or missing data. Sheet permissions are not changed. The footer remains independent when a date has no chores. No outbound family-message automation, Apple account change or iMac configuration is included.

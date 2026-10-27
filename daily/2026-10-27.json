@@ -1,8 +1,13 @@
 {
   "date": "2026-10-27",
   "type": "normal",
-  "category": "fun fact",
-  "generated_at": "2026-10-27T07:16:33.253Z",
-  "title": "Space Catastrophe!",
-  "message": "Did you know that if you could travel at the speed of light, you'd still take over four years to reach the nearest star? Now that's some serious traffic!"
+  "category": "saban",
+  "source_message_id": "M001",
+  "title": "Stay positive",
+  "message": "It's great to be optimistic.",
+  "attribution": "Nick Saban · excerpt",
+  "source_id": "S01",
+  "revision": 0,
+  "family_version": "2026-10-27",
+  "generated_at": "2026-10-27T14:50:58.871Z"
 }
