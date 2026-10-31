@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-31T15:00:31.418Z",
+  "updated_at": "2026-10-31T19:42:14.415Z",
   "provider": "ESPN public schedule and game summary; best-effort availability",
   "games": [
     {
@@ -179,14 +179,11 @@
       "state": "AL",
       "status": "post",
       "snapshot_date": "2026-10-31",
-      "odds_as_of": "2026-10-31T15:00:31.418Z",
-      "odds_provider": "DraftKings",
-      "odds_spread": "ALA -13.5",
-      "odds_total": 49.5,
-      "odds_moneyline": {
-        "home": -600,
-        "away": 440
-      },
+      "odds_as_of": null,
+      "odds_provider": null,
+      "odds_spread": null,
+      "odds_total": null,
+      "odds_moneyline": null,
       "announced_window": null
     },
     {
