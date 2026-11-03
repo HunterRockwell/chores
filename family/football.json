@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-02T19:10:23.153Z",
+  "updated_at": "2026-11-03T01:59:19.024Z",
   "provider": "ESPN public schedule and game summary; best-effort availability",
   "games": [
     {
@@ -202,7 +202,7 @@
       "state": "LA",
       "status": "pre",
       "snapshot_date": "2026-11-02",
-      "odds_as_of": "2026-11-02T19:10:23.153Z",
+      "odds_as_of": "2026-11-03T01:59:19.024Z",
       "odds_provider": "DraftKings",
       "odds_spread": "LSU -5.5",
       "odds_total": 52.5,
@@ -221,8 +221,8 @@
       "opponent_name": "Vanderbilt University",
       "alabama_home": false,
       "neutral_site": false,
-      "kickoff_utc": null,
-      "kickoff_status": "TBA",
+      "kickoff_utc": "2026-11-14T17:45:00.000Z",
+      "kickoff_status": "confirmed",
       "venue": "FirstBank Stadium",
       "city": "Nashville",
       "state": "TN",
@@ -233,7 +233,7 @@
       "odds_spread": null,
       "odds_total": null,
       "odds_moneyline": null,
-      "announced_window": "Early: 11 a.m.–noon CT"
+      "announced_window": null
     },
     {
       "id": "401856746",
