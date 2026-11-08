@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-07T21:26:01.763Z",
+  "updated_at": "2026-11-08T01:03:56.216Z",
   "provider": "ESPN public schedule and game summary; best-effort availability",
   "games": [
     {
@@ -200,9 +200,9 @@
       "venue": "Tiger Stadium (LA)",
       "city": "Baton Rouge",
       "state": "LA",
-      "status": "in",
+      "status": "post",
       "snapshot_date": "2026-11-07",
-      "odds_as_of": "2026-11-07T21:26:01.763Z",
+      "odds_as_of": "2026-11-08T01:03:56.216Z",
       "odds_provider": "DraftKings",
       "odds_spread": "LSU -6",
       "odds_total": 54.5,
