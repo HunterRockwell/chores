@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-14T08:34:43.708Z",
+  "updated_at": "2026-11-14T15:32:43.152Z",
   "provider": "ESPN public schedule and game summary; best-effort availability",
   "games": [
     {
@@ -202,7 +202,7 @@
       "state": "LA",
       "status": "post",
       "snapshot_date": "2026-11-14",
-      "odds_as_of": "2026-11-14T08:34:43.708Z",
+      "odds_as_of": "2026-11-14T15:32:43.152Z",
       "odds_provider": "Draft Kings",
       "odds_spread": "LSU -6",
       "odds_total": 54.5,
@@ -228,13 +228,13 @@
       "state": "TN",
       "status": "pre",
       "snapshot_date": "2026-11-14",
-      "odds_as_of": "2026-11-14T08:34:43.708Z",
+      "odds_as_of": "2026-11-14T15:32:43.152Z",
       "odds_provider": "Draft Kings",
       "odds_spread": "ALA -14",
-      "odds_total": 47.5,
+      "odds_total": 48.5,
       "odds_moneyline": {
-        "home": 490,
-        "away": -675
+        "home": 500,
+        "away": -700
       },
       "announced_window": null
     },
