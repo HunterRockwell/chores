@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-14T20:24:00.738Z",
+  "updated_at": "2026-11-15T00:44:02.487Z",
   "provider": "ESPN public schedule and game summary; best-effort availability",
   "games": [
     {
@@ -202,14 +202,11 @@
       "state": "LA",
       "status": "post",
       "snapshot_date": "2026-11-14",
-      "odds_as_of": "2026-11-14T20:24:00.738Z",
-      "odds_provider": "Draft Kings",
-      "odds_spread": "LSU -6",
-      "odds_total": 54.5,
-      "odds_moneyline": {
-        "home": -218,
-        "away": 180
-      },
+      "odds_as_of": null,
+      "odds_provider": null,
+      "odds_spread": null,
+      "odds_total": null,
+      "odds_moneyline": null,
       "announced_window": null
     },
     {
@@ -226,10 +223,10 @@
       "venue": "FirstBank Stadium",
       "city": "Nashville",
       "state": "TN",
-      "status": "in",
+      "status": "post",
       "snapshot_date": "2026-11-14",
-      "odds_as_of": "2026-11-14T20:24:00.738Z",
-      "odds_provider": "Draft Kings",
+      "odds_as_of": "2026-11-15T00:44:02.487Z",
+      "odds_provider": "DraftKings",
       "odds_spread": "ALA -15.5",
       "odds_total": 48.5,
       "odds_moneyline": {
