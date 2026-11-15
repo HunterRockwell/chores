@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-15T15:18:56.809Z",
+  "updated_at": "2026-11-15T20:48:15.689Z",
   "provider": "ESPN public schedule and game summary; best-effort availability",
   "games": [
     {
@@ -225,7 +225,7 @@
       "state": "TN",
       "status": "post",
       "snapshot_date": "2026-11-15",
-      "odds_as_of": "2026-11-15T15:18:56.809Z",
+      "odds_as_of": "2026-11-15T20:48:15.689Z",
       "odds_provider": "Draft Kings",
       "odds_spread": "ALA -15.5",
       "odds_total": 48.5,
