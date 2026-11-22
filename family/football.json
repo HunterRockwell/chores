@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-21T21:34:31.896Z",
+  "updated_at": "2026-11-22T01:53:57.809Z",
   "provider": "ESPN public schedule and game summary; best-effort availability",
   "games": [
     {
@@ -246,9 +246,9 @@
       "venue": "Bryant-Denny Stadium",
       "city": "Tuscaloosa",
       "state": "AL",
-      "status": "in",
+      "status": "post",
       "snapshot_date": "2026-11-21",
-      "odds_as_of": "2026-11-21T21:34:31.896Z",
+      "odds_as_of": "2026-11-22T01:53:57.809Z",
       "odds_provider": "DraftKings",
       "odds_spread": "ALA -46.5",
       "odds_total": 55.5,
