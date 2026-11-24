@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-23T17:21:40.737Z",
+  "updated_at": "2026-11-24T03:47:56.109Z",
   "provider": "ESPN public schedule and game summary; best-effort availability",
   "games": [
     {
@@ -248,7 +248,7 @@
       "state": "AL",
       "status": "post",
       "snapshot_date": "2026-11-23",
-      "odds_as_of": "2026-11-23T17:21:40.737Z",
+      "odds_as_of": "2026-11-24T03:47:56.109Z",
       "odds_provider": "DraftKings",
       "odds_spread": "ALA -46.5",
       "odds_total": 55.5,
@@ -271,10 +271,10 @@
       "state": "AL",
       "status": "pre",
       "snapshot_date": "2026-11-23",
-      "odds_as_of": "2026-11-23T17:21:40.737Z",
+      "odds_as_of": "2026-11-24T03:47:56.109Z",
       "odds_provider": "DraftKings",
       "odds_spread": "ALA -16.5",
-      "odds_total": 48.5,
+      "odds_total": 49.5,
       "odds_moneyline": {
         "home": -750,
         "away": 525
